@@ -1,28 +1,65 @@
+"use client";
 import { AppBar, Button, Toolbar, Typography } from "@mui/material";
-import { SignIn, SignedOut, UserButton } from "@clerk/nextjs";
+import React, { useEffect, useState } from "react";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/firebase";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+  // const auth = getAuth;
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    signOut(auth)
+      .then(() => {
+        router.push("./sign-in");
+      })
+      .catch((error) => {
+        console.error("sign-out error:", error);
+      });
+  };
   return (
-    <AppBar position="fixed"  sx={{ bgcolor: "#222831" }}>
+    <AppBar position="fixed" sx={{ bgcolor: "#222831" }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Studenthub
         </Typography>
 
-        <Button color="inherit">Flashcard</Button>
-        <Button color="inherit">Rate Professor</Button>
-        <SignedOut>
-          <Button color="inherit">
-            <a href="/sign-in">Login</a>
-          </Button>
-          <Button color="inherit">
-            <a href="/sign-up">Sign Up</a>
-          </Button>
-        </SignedOut>
-        <SignIn>
-          <UserButton />
-        </SignIn>
+        <Button color="inherit" component={Link} href="/flashcards">
+          Flashcards
+        </Button>
+        <Button color="inherit" component={Link} href="/rate-professor">
+          Rate Professor
+        </Button>
+
+        {!user ? (
+          <>
+            <Button color="inherit" component={Link} href="/sign-in">
+              Login
+            </Button>
+            <Button color="inherit" component={Link} href="/sign-up">
+              Sign Up
+            </Button>
+          </>
+        ) : (
+          <>
+            <Typography variant="body1" sx={{ marginRight: 2 }}>
+              {user.displayName || "User"}
+            </Typography>
+            <Button color="inherit" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );

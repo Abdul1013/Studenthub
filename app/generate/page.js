@@ -1,7 +1,7 @@
 "use client";
 
 import db from "@/firebase";
-import { useUser } from "@clerk/nextjs";
+// import { useUser } from "@clerk/nextjs";
 import {
   Box,
   Button,
@@ -18,38 +18,56 @@ import {
   Typography,
   Card,
   DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import { collection, getDoc, writeBatch, doc } from "firebase/firestore";
 // import { transform } from "next/dist/build/swc";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+// import { currentUser } from "@clerk/nextjs/dist/types/server";
+// import { currentUser } from "@clerk/nextjs/dist/types/server";
 
 export default function Generate() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  // const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashcards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [text, setText] = useState("");
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false); // for modals
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        router.push("/signin");
+      }
+    });
 
-  if (!isSignedIn) {
-    return <div>Please SignIn to Access this page</div>
-  }
+    return () => unsubscribe();
+  }, [router]);
 
   const handleSubmit = async () => {
-    fetch("api/generate", {
-      method: "POST",
-      body: text,
-    })
-      .then((res) => res.json())
-      .then((data) => setFlashcards(data));
-    // console.log(data);
+    setLoading(true);
+    try {
+      const response = await fetch("api/generate", {
+        method: "POST",
+        body: text,
+      });
+      const data = await response.json();
+      setFlashcards(data);
+    } catch (error) {
+      console.error("Error fetching flashcards", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCardClick = (id) => {
@@ -75,6 +93,8 @@ export default function Generate() {
       alert("User is not authenticated. Please sign in.");
       return;
     }
+
+    setSaving(true);
     const batch = writeBatch(db);
     const userDocRef = doc(collection(db, "users"), user.id);
     const docSnap = await getDoc(userDocRef);
@@ -83,6 +103,7 @@ export default function Generate() {
       const collection = docSnap.data().flashcards || [];
       if (collection.find((f) => f.name === name)) {
         alert("A deck with this name already exists");
+        setSaving(false);
         return;
       } else {
         collection.push({ name });
@@ -97,9 +118,16 @@ export default function Generate() {
       batch.set(cardDocref, flashcards);
     });
 
-    await batch.commit();
-    handleClose();
-    router.push("/flashcards");
+    try {
+      await batch.commit();
+      handleClose();
+      router.push("/flashcards");
+    } catch (error) {
+      console.error("Error saving flashcards", error);
+    } finally {
+      setSaving(false);
+    }
+
     // const response = await fetch('/api/save', {
   };
 
@@ -162,7 +190,7 @@ export default function Generate() {
                             width: "100%",
                             height: "200px",
                             boxShadow: "0 4px 8px 0 rgba(0,0,0, 0.2)",
-                            transform: flipped[index]
+                            transform: flipped[flashcard.id]
                               ? "rotateY(180deg)"
                               : "rotateY(0deg)",
                           },

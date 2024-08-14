@@ -66,7 +66,7 @@ export const Subscription = () => {
               variant="contained"
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
             >
-              Learn More
+              Subscribe
             </Button>
           </Paper>
         </Grid>

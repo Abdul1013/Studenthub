@@ -47,7 +47,7 @@ export async function POST(req) {
   const data = await req.text();
 
   const flashcards = await getGroqChatCompletion(data);
-  return NextResponse.json(flashcards)
+  return NextResponse.json(flashcards.flashcards);
 }
 
 export async function getGroqChatCompletion(data) {

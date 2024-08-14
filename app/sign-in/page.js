@@ -5,7 +5,6 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  sendSignInLinkToEmail,
 } from "firebase/auth";
 import { app } from "@/firebase";
 import Navbar from "@/app/Navbar";

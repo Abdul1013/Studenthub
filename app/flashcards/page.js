@@ -1,6 +1,6 @@
 "use client";
 
-import { SignIn, useUser } from "@clerk/nextjs";
+// import { SignIn, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { collection, getDoc, setDoc, doc } from "firebase/firestore";
 import db from "@/firebase";
@@ -16,7 +16,7 @@ import {
 import Navbar from "../Navbar";
 
 export default function Flashcards() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  // const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashcards] = useState([]);
   const router = useRouter();
 
@@ -34,10 +34,10 @@ export default function Flashcards() {
       }
     }
     getFlashcards();
-  }, [user]);
-  if (isLoaded || isSignedIn) {
-    return <></>;
-  }
+  }, []);
+  // if (isLoaded || isSignedIn) {
+  //   return <></>;
+  // }
 
   const handleCardClick = (id) => {
     router.push(`/flashcard?id=${id}`);

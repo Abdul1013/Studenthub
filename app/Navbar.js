@@ -9,11 +9,15 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const router = useRouter();
-  // const auth = getAuth;
+  // const auth = getAuth();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
     });
     return () => unsubscribe();
   }, []);

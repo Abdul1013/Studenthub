@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
+// import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import db from "@/firebase";
@@ -16,7 +16,8 @@ import {
 import Navbar from "../Navbar";
 
 export default function Flashcard() {
-  const { isLoaded, isSignedIn, user } = useUser();
+  // const { isLoaded, isSignedIn, user } = useUser();
+  const [user, setUser] = useState();// come back and fix
   const [flashcards, setFlashcards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const searchParams = useSearchParams();
@@ -43,14 +44,14 @@ export default function Flashcard() {
       [id]: !prev[id],
     }));
   };
-  if (isLoaded || isSignedIn) {
-    return (
-      <>
-        <Navbar />
-        <h1>Please Sign IN</h1>
-      </>
-    );
-  }
+  // if (isLoaded || isSignedIn) {
+  //   return (
+  //     <>
+  //       <Navbar />
+  //       <h1>Please Sign IN</h1>
+  //     </>
+  //   );
+  // }
   return (
     <Container maxWidth="100vw">
       <Navbar />

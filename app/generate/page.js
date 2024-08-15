@@ -1,7 +1,6 @@
 "use client";
 
 import { db, auth } from "@/firebase";
-// import { useUser } from "@clerk/nextjs";
 import {
   Box,
   Button,
@@ -21,16 +20,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { collection, getDoc, writeBatch, doc } from "firebase/firestore";
-// import { transform } from "next/dist/build/swc";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-// import { currentUser } from "@clerk/nextjs/dist/types/server";
-// import { currentUser } from "@clerk/nextjs/dist/types/server";
 
 export default function Generate() {
-  // const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashcards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [text, setText] = useState("");
@@ -84,55 +79,138 @@ export default function Generate() {
     setOpen(false);
   };
 
-  const saveFlashcards = async () => {
-    if (!name) {
-      alert("Please enter a name for your deck");
-      return;
-    }
-    if (!user || !user.uid) {
-      alert("User is not authenticated. Please sign in.");
-      return;
-    }
+  // // const saveFlashcards = async () => {
+  //   if (!name) {
+  //     alert("Please enter a name for your deck");
+  //     return;
+  //   }
 
-    setSaving(true);
-    const batch = writeBatch(db);
-    const userDocRef = doc(db, "users", user.uid);
+  //   if (!user || !user.uid) {
+  //     alert("User is not authenticated. Please sign in.");
+  //     return;
+  //   }
+
+  //   setSaving(true);
+  //   const batch = writeBatch(db);
+  //   const userDocRef = doc(db, "users", user.uid);
+  //   const docSnap = await getDoc(userDocRef);
+
+  //   let existingDecks = [];
+
+  //   if (docSnap.exists()) {
+  //     existingDecks = docSnap.data().flashcards || [];
+  //     if (existingDecks.find((deck) => deck.name === name)) {
+  //       alert("A deck with this name already exists");
+  //       setSaving(false);
+  //       return;
+  //     }
+  //   }
+
+  //   // Add the new deck to the user's collection
+  //   existingDecks.push({ name });
+  //   batch.set(userDocRef, { flashcards: existingDecks }, { merge: true });
+
+  //   // Set flashcards in a subcollection for the deck
+  //   const colRef = collection(
+  //     db,
+  //     "users",
+  //     user.uid,
+  //     "flashcards",
+  //     name,
+  //     "cards"
+  //   );
+
+  //   flashcards.forEach((flashcard) => {
+  //     const cardDocRef = doc(colRef, flashcard.id);
+  //     batch.set(cardDocRef, flashcard);
+  //   });
+
+  //   try {
+  //     await batch.commit();
+  //     handleClose();
+  //     router.push("/flashcards");
+  //   } catch (error) {
+  //     console.error("Error saving flashcards", error);
+  //   } finally {
+  //     setSaving(false);
+  //   }
+
+  //   // const response = await fetch('/api/save', {
+  // };
+
+  // const saveFlashcards = async () => {
+  //   if (!name) {
+  //     alert("Please enter a name for your flashcard set.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const userDocRef = doc(db, "users", user.uid);
+  //     const userDocSnap = await getDoc(userDocRef);
+
+  //     const batch = writeBatch(db);
+
+  //     if (userDocSnap.exists()) {
+  //       const userData = userDocSnap.data();
+  //       const updatedSets = [...(userData.flashcardSets || []), { name }];
+  //       batch.update(userDocRef, { flashcardSets: updatedSets });
+  //     } else {
+  //       batch.set(userDocRef, { flashcardSets: [{ name }] });
+  //     }
+
+  //     // The key part is ensuring the path to the document isn't empty
+  //     const setDocRef = doc(collection(userDocRef, "flashcardSets"), name);
+  //     flashcards.forEach((flashcard) => {
+  //       const cardDocRef = doc(collection(setDocRef, "cards"), flashcard.id);
+  //       batch.set(cardDocRef, flashcard);
+  //     });
+
+  //     await batch.commit();
+
+  //     alert("Flashcards saved successfully!");
+  //     handleCloseDialog();
+  //     setName("");
+  //     router.push("/flashcards");
+  //   } catch (error) {
+  //     console.error("Error saving flashcards:", error);
+  //     alert("An error occurred while saving flashcards. Please try again.");
+  //   }
+  // };
+
+  const saveFlashcards = async () => {
+    if (!setName.trim()) {
+      alert("Please enter a name for your flashcard set.");
+      return;
+    }
 
     try {
-      // Check if the deck already exists
-      const docSnap = await getDoc(userDocRef);
-      const existingDecks = docSnap.exists()
-        ? docSnap.data().flashcards || []
-        : [];
+      const userDocRef = doc(collection(db, "users"), user.id);
+      const userDocSnap = await getDoc(userDocRef);
 
-      if (existingDecks.find((deck) => deck.name === name)) {
-        alert("A deck with this name already exists");
-        setSaving(false);
-        return;
+      const batch = writeBatch(db);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        const updatedSets = [
+          ...(userData.flashcardSets || []),
+          { name: setName },
+        ];
+        batch.update(userDocRef, { flashcardSets: updatedSets });
+      } else {
+        batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
       }
 
-      // Update the user's flashcards list
-      existingDecks.push({ name });
-      batch.set(userDocRef, { flashcards: existingDecks }, { merge: true });
+      const setDocRef = doc(collection(userDocRef, "flashcardSets"), setName);
+      batch.set(setDocRef, { flashcards });
 
-      // Reference to the new flashcards collection
-      const colRef = collection(db, "users", user.uid, "flashcards", name);
-
-      // Save each flashcard
-      flashcards.forEach((flashcard) => {
-        // Ensure flashcard ID is unique
-        const cardDocRef = doc(colRef, flashcard.id || Date.now().toString());
-        batch.set(cardDocRef, flashcard);
-      });
-
-      // Commit the batch
       await batch.commit();
-      handleClose();
-      router.push("/flashcards");
+
+      alert("Flashcards saved successfully!");
+      handleCloseDialog();
+      setName("");
     } catch (error) {
-      console.error("Error saving flashcards", error);
-    } finally {
-      setSaving(false);
+      console.error("Error saving flashcards:", error);
+      alert("An error occurred while saving flashcards. Please try again.");
     }
   };
 

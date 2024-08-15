@@ -42,12 +42,41 @@ return the following in json format
 }`;
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-export async function POST(req) {
-  
-  const data = await req.text();
 
-  const flashcards = await getGroqChatCompletion(data);
-  return NextResponse.json(flashcards.flashcards);
+export async function POST(req) {
+  try {
+    const data = await req.text();
+
+    if (!data || data.trim() === "") {
+      return NextResponse.json(
+        { error: "Input data is required" },
+        { status: 400 }
+      );
+    }
+
+    const flashcards = await getGroqChatCompletion(data);
+
+    if (!flashcards || !flashcards.flashcards) {
+      throw new Error("Invalid response from Groq API");
+    }
+
+    // Validate flashcards to ensure 'front' and 'back' fields are present
+    const validFlashcards = flashcards.flashcards.filter(
+      (card) => card.front && card.back
+    );
+
+    if (validFlashcards.length === 0) {
+      return NextResponse.json(
+        { error: "No valid flashcards generated" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(validFlashcards);
+  } catch (error) {
+    console.error("Error generating flashcards:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function getGroqChatCompletion(data) {
@@ -57,11 +86,14 @@ export async function getGroqChatCompletion(data) {
       { role: "user", content: data },
     ],
     model: "llama3-8b-8192",
-    response_format:{ type: "json_object"}, //ensure response is always in json
+    response_format: { type: "json_object" }, // Ensure response is always in JSON
   });
 
-  const flashcards = JSON.parse(response.choices[0].message.content);
-  return flashcards;
- 
+  try {
+    const flashcards = JSON.parse(response.choices[0].message.content);
+    return flashcards;
+  } catch (error) {
+    console.error("Error parsing flashcard data:", error);
+    throw new Error("Failed to parse flashcard data");
+  }
 }
-

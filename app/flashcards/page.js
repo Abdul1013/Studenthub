@@ -3,7 +3,8 @@
 // import { SignIn, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { collection, getDoc, setDoc, doc } from "firebase/firestore";
-import db from "@/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {db} from "@/firebase";
 import { useRouter } from "next/navigation";
 import { Container } from "@mui/system";
 import {
@@ -18,23 +19,39 @@ import Navbar from "../Navbar";
 export default function Flashcards() {
   // const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashcards] = useState([]);
+  const [user, setUser] = useState(null)
   const router = useRouter();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        router.push("/signin");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
 
   useEffect(() => {
     async function getFlashcards() {
       if (!user) return;
-      const docRef = doc(collection(db, "users"), user.id);
+      const userId = user.uid;
+      const docRef = doc(collection(db, "users"), userId);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        const collection = docSnap.data().flashcards || [];
-        setFlashcards(collection);
+        const flashcards = docSnap.data().flashcards || [];
+        setFlashcards(flashcards);
       } else {
         await setDoc(docRef, { flashcards: [] });
       }
     }
     getFlashcards();
-  }, []);
+  }, [user]);
   // if (isLoaded || isSignedIn) {
   //   return <></>;
   // }

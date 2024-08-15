@@ -1,6 +1,6 @@
 "use client";
 
-import db from "@/firebase";
+import { db, auth } from "@/firebase";
 // import { useUser } from "@clerk/nextjs";
 import {
   Box,
@@ -89,36 +89,43 @@ export default function Generate() {
       alert("Please enter a name for your deck");
       return;
     }
-    if (!user || !user.id) {
+    if (!user || !user.uid) {
       alert("User is not authenticated. Please sign in.");
       return;
     }
 
     setSaving(true);
     const batch = writeBatch(db);
-    const userDocRef = doc(collection(db, "users"), user.id);
-    const docSnap = await getDoc(userDocRef);
+    const userDocRef = doc(db, "users", user.uid);
 
-    if (docSnap.exists()) {
-      const collection = docSnap.data().flashcards || [];
-      if (collection.find((f) => f.name === name)) {
+    try {
+      // Check if the deck already exists
+      const docSnap = await getDoc(userDocRef);
+      const existingDecks = docSnap.exists()
+        ? docSnap.data().flashcards || []
+        : [];
+
+      if (existingDecks.find((deck) => deck.name === name)) {
         alert("A deck with this name already exists");
         setSaving(false);
         return;
-      } else {
-        collection.push({ name });
-        batch.set(userDocRef, { flashcards: collection }, { merge: true });
       }
-    } else {
-      batch.set(userDocRef, { flashcards: [{ name }] });
-    }
-    const colRef = collection(userDocRef, name);
-    flashcards.forEach((flashcards) => {
-      const cardDocref = doc(colRef);
-      batch.set(cardDocref, flashcards);
-    });
 
-    try {
+      // Update the user's flashcards list
+      existingDecks.push({ name });
+      batch.set(userDocRef, { flashcards: existingDecks }, { merge: true });
+
+      // Reference to the new flashcards collection
+      const colRef = collection(db, "users", user.uid, "flashcards", name);
+
+      // Save each flashcard
+      flashcards.forEach((flashcard) => {
+        // Ensure flashcard ID is unique
+        const cardDocRef = doc(colRef, flashcard.id || Date.now().toString());
+        batch.set(cardDocRef, flashcard);
+      });
+
+      // Commit the batch
       await batch.commit();
       handleClose();
       router.push("/flashcards");
@@ -127,8 +134,6 @@ export default function Generate() {
     } finally {
       setSaving(false);
     }
-
-    // const response = await fetch('/api/save', {
   };
 
   return (

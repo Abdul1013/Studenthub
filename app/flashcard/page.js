@@ -1,9 +1,10 @@
 "use client";
-// import { useUser } from "@clerk/nextjs";
+
 import { useEffect, useState } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import db from "@/firebase";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Container,
   Grid,
@@ -12,29 +13,54 @@ import {
   Typography,
   CardContent,
   Box,
+  CircularProgress
 } from "@mui/material";
 import Navbar from "../Navbar";
 
 export default function Flashcard() {
-  // const { isLoaded, isSignedIn, user } = useUser();
-  const [user, setUser] = useState();// come back and fix
+  const [user, setUser] = useState(null); // come back and fix
   const [flashcards, setFlashcards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [flipped, setFlipped] = useState({});
   const searchParams = useSearchParams();
   const search = searchParams.get("id");
+  const router = useRouter();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        router.push("/signin");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   useEffect(() => {
     async function getFlashcard() {
       if (!search || !user) return;
-      const colRef = collection(doc(collection(db, "users"), user.id), search);
-      const docs = await getDocs(colRef);
-      const flashcards = [];
 
-      docs.forEach((doc) => {
-        flashcards.push({ id: doc.id, ...doc.data() });
-      });
-      setFlashcards(flashcards);
+      try {
+        // Reference to the user's flashcard subcollection
+        const userDocRef = doc(db, "users", user.uid);
+        const colRef = collection(db, "users", user.uid, "flashcards", search);
+        const querySnapshot = await getDocs(colRef);
+        const flashcardsData = [];
+
+        querySnapshot.forEach((doc) => {
+          flashcardsData.push({ id: doc.id, ...doc.data() });
+        });
+        setFlashcards(flashcardsData);
+      } catch (error) {
+        console.error("Error fetching flashcards:", error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
+      }
     }
+
     getFlashcard();
   }, [user, search]);
 
@@ -44,14 +70,17 @@ export default function Flashcard() {
       [id]: !prev[id],
     }));
   };
-  // if (isLoaded || isSignedIn) {
-  //   return (
-  //     <>
-  //       <Navbar />
-  //       <h1>Please Sign IN</h1>
-  //     </>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <Container maxWidth="100vw">
+        <Navbar />
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="100vw">
       <Navbar />

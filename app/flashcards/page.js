@@ -1,27 +1,20 @@
 "use client";
 
-// import { SignIn, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { collection, getDoc, setDoc, doc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {db} from "@/firebase";
+import { db } from "@/firebase";
 import { useRouter } from "next/navigation";
 import { Container } from "@mui/system";
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Card, CardActionArea, CardContent, Grid, Typography } from "@mui/material";
 import Navbar from "../Navbar";
 
 export default function Flashcards() {
-  // const { isLoaded, isSignedIn, user } = useUser();
   const [flashcards, setFlashcards] = useState([]);
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(null);
   const router = useRouter();
 
+  // Handle user authentication
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -35,26 +28,32 @@ export default function Flashcards() {
     return () => unsubscribe();
   }, [router]);
 
-
+  // Fetch flashcards for the authenticated user
   useEffect(() => {
-    async function getFlashcards() {
+    async function fetchFlashcards() {
       if (!user) return;
-      const userId = user.uid;
-      const docRef = doc(collection(db, "users"), userId);
-      const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const flashcards = docSnap.data().flashcards || [];
-        setFlashcards(flashcards);
-      } else {
-        await setDoc(docRef, { flashcards: [] });
+      try {
+        const flashcardsCollection = collection(db, "flashcards");
+        const flashcardsSnapshot = await getDocs(flashcardsCollection);
+        const flashcardsList = flashcardsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        // Filter flashcards to show only the ones created by the current user
+        const userFlashcards = flashcardsList.filter(
+          (flashcard) => flashcard.userId === user.uid
+        );
+
+        setFlashcards(userFlashcards);
+      } catch (error) {
+        console.error("Error fetching flashcards:", error);
       }
     }
-    getFlashcards();
+
+    fetchFlashcards();
   }, [user]);
-  // if (isLoaded || isSignedIn) {
-  //   return <></>;
-  // }
 
   const handleCardClick = (id) => {
     router.push(`/flashcard?id=${id}`);

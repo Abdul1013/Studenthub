@@ -1,6 +1,6 @@
 "use client";
 
-import { db, auth } from "@/firebase";
+import { db } from "@/firebase";
 import {
   Box,
   Button,
@@ -19,18 +19,18 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
-import { collection, getDoc, writeBatch, doc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore"; // Correctly import from firestore
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Correctly import from auth
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 export default function Generate() {
   const [flashcards, setFlashcards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
+  const [flipped, setFlipped] = useState({});
   const [text, setText] = useState("");
-  const [name, setName] = useState("");
-  const [open, setOpen] = useState(false); // for modals
+  const [deckName, setDeckName] = useState("");
+  const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -54,12 +54,15 @@ export default function Generate() {
     try {
       const response = await fetch("api/generate", {
         method: "POST",
-        body: text,
+        body: JSON.stringify({ text }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       const data = await response.json();
       setFlashcards(data);
     } catch (error) {
-      console.error("Error fetching flashcards", error);
+      console.error("Error generating flashcards", error);
     } finally {
       setLoading(false);
     }
@@ -75,142 +78,45 @@ export default function Generate() {
   const handleOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => {
     setOpen(false);
   };
 
-  // // const saveFlashcards = async () => {
-  //   if (!name) {
-  //     alert("Please enter a name for your deck");
-  //     return;
-  //   }
-
-  //   if (!user || !user.uid) {
-  //     alert("User is not authenticated. Please sign in.");
-  //     return;
-  //   }
-
-  //   setSaving(true);
-  //   const batch = writeBatch(db);
-  //   const userDocRef = doc(db, "users", user.uid);
-  //   const docSnap = await getDoc(userDocRef);
-
-  //   let existingDecks = [];
-
-  //   if (docSnap.exists()) {
-  //     existingDecks = docSnap.data().flashcards || [];
-  //     if (existingDecks.find((deck) => deck.name === name)) {
-  //       alert("A deck with this name already exists");
-  //       setSaving(false);
-  //       return;
-  //     }
-  //   }
-
-  //   // Add the new deck to the user's collection
-  //   existingDecks.push({ name });
-  //   batch.set(userDocRef, { flashcards: existingDecks }, { merge: true });
-
-  //   // Set flashcards in a subcollection for the deck
-  //   const colRef = collection(
-  //     db,
-  //     "users",
-  //     user.uid,
-  //     "flashcards",
-  //     name,
-  //     "cards"
-  //   );
-
-  //   flashcards.forEach((flashcard) => {
-  //     const cardDocRef = doc(colRef, flashcard.id);
-  //     batch.set(cardDocRef, flashcard);
-  //   });
-
-  //   try {
-  //     await batch.commit();
-  //     handleClose();
-  //     router.push("/flashcards");
-  //   } catch (error) {
-  //     console.error("Error saving flashcards", error);
-  //   } finally {
-  //     setSaving(false);
-  //   }
-
-  //   // const response = await fetch('/api/save', {
-  // };
-
-  // const saveFlashcards = async () => {
-  //   if (!name) {
-  //     alert("Please enter a name for your flashcard set.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const userDocRef = doc(db, "users", user.uid);
-  //     const userDocSnap = await getDoc(userDocRef);
-
-  //     const batch = writeBatch(db);
-
-  //     if (userDocSnap.exists()) {
-  //       const userData = userDocSnap.data();
-  //       const updatedSets = [...(userData.flashcardSets || []), { name }];
-  //       batch.update(userDocRef, { flashcardSets: updatedSets });
-  //     } else {
-  //       batch.set(userDocRef, { flashcardSets: [{ name }] });
-  //     }
-
-  //     // The key part is ensuring the path to the document isn't empty
-  //     const setDocRef = doc(collection(userDocRef, "flashcardSets"), name);
-  //     flashcards.forEach((flashcard) => {
-  //       const cardDocRef = doc(collection(setDocRef, "cards"), flashcard.id);
-  //       batch.set(cardDocRef, flashcard);
-  //     });
-
-  //     await batch.commit();
-
-  //     alert("Flashcards saved successfully!");
-  //     handleCloseDialog();
-  //     setName("");
-  //     router.push("/flashcards");
-  //   } catch (error) {
-  //     console.error("Error saving flashcards:", error);
-  //     alert("An error occurred while saving flashcards. Please try again.");
-  //   }
-  // };
-
   const saveFlashcards = async () => {
-    if (!setName.trim()) {
+    if (!deckName.trim()) {
       alert("Please enter a name for your flashcard set.");
       return;
     }
 
+    setSaving(true);
+
     try {
-      const userDocRef = doc(collection(db, "users"), user.id);
-      const userDocSnap = await getDoc(userDocRef);
+      const user = getAuth().currentUser;
 
-      const batch = writeBatch(db);
-
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        const updatedSets = [
-          ...(userData.flashcardSets || []),
-          { name: setName },
-        ];
-        batch.update(userDocRef, { flashcardSets: updatedSets });
-      } else {
-        batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
+      if (!user) {
+        alert("You need to be signed in to save flashcards.");
+        return;
       }
 
-      const setDocRef = doc(collection(userDocRef, "flashcardSets"), setName);
-      batch.set(setDocRef, { flashcards });
+      const flashcardSet = {
+        userId: user.uid,
+        name: deckName.trim(),
+        flashcards,
+        createdAt: new Date(),
+      };
 
-      await batch.commit();
+      await addDoc(collection(db, "flashcards"), flashcardSet);
 
       alert("Flashcards saved successfully!");
-      handleCloseDialog();
-      setName("");
+      handleClose();
+      setDeckName(""); // Clear the input field after saving
+      router.push("/flashcards");
     } catch (error) {
       console.error("Error saving flashcards:", error);
       alert("An error occurred while saving flashcards. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -226,7 +132,7 @@ export default function Generate() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4"> Generate Flashcard </Typography>
+        <Typography variant="h4">Generate Flashcard</Typography>
         <Paper sx={{ p: 4, width: "100%" }}>
           <TextField
             value={text}
@@ -244,15 +150,14 @@ export default function Generate() {
             onClick={handleSubmit}
             fullWidth
           >
-            {" "}
-            Submit{" "}
+            Submit
           </Button>
         </Paper>
       </Box>
 
       {flashcards.length > 0 && (
         <Box sx={{ mt: 4 }}>
-          <Typography variant="h4"> Flashcard Preview </Typography>
+          <Typography variant="h4">Flashcard Preview</Typography>
           <Grid container spacing={4}>
             {flashcards.map((flashcard) => (
               <Grid item xs={12} sm={6} md={4} key={flashcard.id}>
@@ -336,8 +241,8 @@ export default function Generate() {
             label="Collection Name"
             type="text"
             fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={deckName}
+            onChange={(e) => setDeckName(e.target.value)}
             variant="outlined"
           />
         </DialogContent>
@@ -348,8 +253,13 @@ export default function Generate() {
           <Button
             style={{ backgroundColor: "#30475E" }}
             onClick={saveFlashcards}
+            disabled={saving}
           >
-            Save
+            {saving ? (
+              <CircularProgress size={24} sx={{ color: "#fff" }} />
+            ) : (
+              "Save"
+            )}
           </Button>
         </DialogActions>
       </Dialog>

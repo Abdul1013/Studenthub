@@ -1,5 +1,7 @@
+"use client"
 import React from "react";
 import { Grid, Typography, Button, Paper } from "@mui/material";
+import getStripe from "@/utils/get-stripe";
 
 export const Subscription = () => {
   const items = [
@@ -28,6 +30,29 @@ export const Subscription = () => {
       feature3: "Advanced analytics",
     },
   ];
+  const handleSubmit = async () => {
+    const checkoutSession = await fetch("/api/checkout_session", {
+      method: "POST",
+      headers: {
+        origin: "http://localhost:3000",
+      },
+    });
+
+    const checkoutSessionJson = await checkoutSession.json();
+
+    if (checkoutSession.status === 500) {
+      console.error(checkoutSession.message);
+      return;
+    }
+
+    const stripe = await getStripe();
+    const error = await stripe.redirectToCheckout({
+      sessionId: checkoutSessionJson.id,
+    });
+    if (error) {
+      console.warn(error.message);
+    }
+  };
   return (
     <Grid container spacing={2}>
       {items.map((item, id) => (
@@ -64,6 +89,7 @@ export const Subscription = () => {
 
             <Button
               variant="contained"
+              onClick={handleSubmit}
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
             >
               Subscribe

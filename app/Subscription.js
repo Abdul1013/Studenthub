@@ -1,9 +1,17 @@
-"use client"
-import React from "react";
-import { Grid, Typography, Button, Paper } from "@mui/material";
+"use client";
+import React, { useState } from "react";
+import {
+  Grid,
+  Typography,
+  Button,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 import getStripe from "@/utils/get-stripe";
 
 export const Subscription = () => {
+  const [loading, setLoading] = useState(false);
+
   const items = [
     {
       id: 1,
@@ -30,33 +38,44 @@ export const Subscription = () => {
       feature3: "Advanced analytics",
     },
   ];
-  const handleSubmit = async () => {
-    const checkoutSession = await fetch("/api/checkout_session", {
-      method: "POST",
-      headers: {
-        origin: "http://localhost:3000",
-      },
-    });
 
-    const checkoutSessionJson = await checkoutSession.json();
+  const handleSubmit = async (planId) => {
+    setLoading(true);
 
-    if (checkoutSession.status === 500) {
-      console.error(checkoutSession.message);
-      return;
-    }
+    try {
+      const res = await fetch(`/api/checkout_session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planId }),
+      });
 
-    const stripe = await getStripe();
-    const error = await stripe.redirectToCheckout({
-      sessionId: checkoutSessionJson.id,
-    });
-    if (error) {
-      console.warn(error.message);
+      const checkoutSessionJson = await res.json();
+
+      if (res.ok) {
+        const stripe = await getStripe();
+        const { error } = await stripe.redirectToCheckout({
+          sessionId: checkoutSessionJson.id,
+        });
+
+        if (error) {
+          console.warn(error.message);
+        }
+      } else {
+        console.error(checkoutSessionJson.error || "An error occurred");
+      }
+    } catch (error) {
+      console.error("An error occurred during checkout", error);
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <Grid container spacing={2}>
-      {items.map((item, id) => (
-        <Grid item xs={12} sm={6} md={4} key={id}>
+      {items.map((item) => (
+        <Grid item xs={12} sm={6} md={4} key={item.id}>
           <Paper
             elevation={3}
             style={{
@@ -89,10 +108,15 @@ export const Subscription = () => {
 
             <Button
               variant="contained"
-              onClick={handleSubmit}
+              onClick={() => handleSubmit(item.id)}
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
+              disabled={loading}
             >
-              Subscribe
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Subscribe"
+              )}
             </Button>
           </Paper>
         </Grid>

@@ -3,7 +3,7 @@ import Head from "next/head";
 import Navbar from "./Navbar";
 import { FeatureSection } from "./FeatureSection";
 import { Subscription } from "./Subscription";
-import getStripe from "@/utils/get-stripe";
+// import getStripe from "@/utils/get-stripe";
 
 export default function Home() {
 

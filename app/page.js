@@ -5,9 +5,27 @@ import Navbar from "./Navbar";
 import { FeatureSection } from "./FeatureSection";
 import { Subscription } from "./Subscription";
 import { useRouter } from "next/navigation";
+import { analytics } from "@/firebase";
 
 export default function Home() {
   const router = useRouter();
+  useEffect(() => {
+    const logEvent = (url) => {
+      analytics.logEvent("page_view", {
+        page_path: url,
+      });
+    };
+
+    logEvent(window.location.pathname);
+
+    // Log page view on route change
+    router.events.on("routeChangeComplete", logEvent);
+
+    // Cleanup event listener on unmount
+    return () => {
+      router.events.off("routeChangeComplete", logEvent);
+    };
+  }, [router.events]);
 
   return (
     <Container maxWidth="lg">

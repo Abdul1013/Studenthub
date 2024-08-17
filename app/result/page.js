@@ -10,8 +10,9 @@ import {
   Button,
 } from "@mui/material";
 import { format } from "date-fns";
+import { Suspense } from "react";
 
-const ResultPage = () => {
+const ResultPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const session_id = searchParams.get("session_id");
@@ -26,9 +27,9 @@ const ResultPage = () => {
 
       try {
         const res = await fetch(
-          `/api/checkout_sessions?session_id=${session_id}` //or sessionId if initial doesn't work
+          `/api/checkout_sessions?session_id=${session_id}`
         );
-        
+
         const sessionData = await res.json();
         if (res.ok) {
           setSession(sessionData);
@@ -76,7 +77,7 @@ const ResultPage = () => {
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6">Subscription ID: {session.id}</Typography>
             <Typography variant="h6">
-              Subscription Date: {session.id}
+              Subscription Date: {formattedDate}
             </Typography>
             <Typography variant="h6">
               Subscription Status: {session.status}
@@ -100,7 +101,7 @@ const ResultPage = () => {
           <Typography variant="h4">Payment Failed</Typography>
           <Box sx={{ mt: 4 }}>
             <Typography variant="body1">
-              Your payment wasn`&apos;`t successful. Please try again later.
+              Your payment wasn&apos;t successful. Please try again later.
             </Typography>
           </Box>
           <Button
@@ -116,5 +117,11 @@ const ResultPage = () => {
     </Container>
   );
 };
+
+const ResultPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ResultPageContent />
+  </Suspense>
+);
 
 export default ResultPage;

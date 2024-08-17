@@ -18,7 +18,6 @@ import {
   Paper,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-// import App from "next/app";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -26,7 +25,6 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
-  // const [passwordless, setPasswordless] = useState(false);
 
   const auth = getAuth(app);
   const googleProvider = new GoogleAuthProvider();
@@ -39,13 +37,12 @@ export default function SignUpPage() {
   const handleSignInWithPassword = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setSuccessMessage("Sign-in successful! Redirecting to Homepage...");
+      setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
       router.push("/dashboard");
     } catch (error) {
       setError(error.message);
     }
   };
-
 
   const handleGoogleSignIn = async () => {
     try {
@@ -81,7 +78,6 @@ export default function SignUpPage() {
           sx={{
             width: "90%",
             textAlign: "center",
-            // padding: "2rem",
           }}
           display="flex"
           flexDirection="column"
@@ -96,7 +92,7 @@ export default function SignUpPage() {
               {error}
             </Typography>
           )}
-          {setSuccessMessage && (
+          {successMessage && (
             <Typography variant="body1" color="success.main" gutterBottom>
               {successMessage}
             </Typography>
@@ -132,7 +128,7 @@ export default function SignUpPage() {
                 "&:hover": {
                   backgroundColor: "#2c3e50",
                 },
-                cursor: "pointer"
+                cursor: "pointer",
               }}
               fullWidth
             >
@@ -147,7 +143,7 @@ export default function SignUpPage() {
                 "&:hover": {
                   backgroundColor: "#c1351d",
                 },
-                cursor: "pointer"
+                cursor: "pointer",
               }}
               fullWidth
             >
@@ -155,21 +151,18 @@ export default function SignUpPage() {
             </Button>
             <Typography variant="body2" sx={{ mt: 4 }}>
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" passHref>
-                <Typography
-                  component="a"
-                  sx={{
-                    color: "primary.main",
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  Sign up
-                </Typography>
+              <Link
+                href="/sign-up"
+                passHref
+                style={{
+                  color: "primary.main",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
+              >
+                Sign up
               </Link>
             </Typography>
-            
-           
           </Box>
         </Box>
       </Paper>

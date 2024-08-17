@@ -1,16 +1,17 @@
 "use client";
 import {
   AppBar,
-  Button,
+  IconButton,
   Toolbar,
   Typography,
-  IconButton,
   Drawer,
   List,
   ListItem,
   ListItemText,
+  Box,
   useMediaQuery,
   useTheme,
+  Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useEffect, useState } from "react";
@@ -28,11 +29,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+      setUser(currentUser);
     });
     return () => unsubscribe();
   }, []);
@@ -51,36 +48,39 @@ export default function Navbar() {
     setDrawerOpen(open);
   };
 
-  const drawerContent = (
-    <List>
-      <ListItem button component={Link} href="/dashboard">
-        <ListItemText primary="Home" />
+  const renderMenuItems = () => (
+    <>
+      <ListItem>
+        <Button onClick={() => router.push("/dashboard")}> Home </Button>
       </ListItem>
-      <ListItem button component={Link} href="/flashcards">
-        <ListItemText primary="Flashcards" />
+      <ListItem>
+        <Button onClick={() => router.push("/flashcards")}> Flashcards </Button>
       </ListItem>
       {!user ? (
         <>
-          <ListItem button component={Link} href="/sign-in">
-            <ListItemText primary="Login" />
+          <ListItem>
+            <Button onClick={() => router.push("/sign-in")}> SignIn </Button>
           </ListItem>
-          <ListItem button component={Link} href="/sign-up">
-            <ListItemText primary="Sign Up" />
+          <ListItem>
+            <Button onClick={() => router.push("/sign-up")}> SignUp</Button>
           </ListItem>
         </>
       ) : (
         <>
           <ListItem>
-            <Typography variant="body1" sx={{ marginRight: 2 }}>
+            <Typography
+              variant="body1"
+              sx={{ marginRight: 2, color: "#FFFFFF" }}
+            >
               {user.displayName || "User"}
             </Typography>
           </ListItem>
-          <ListItem button onClick={handleSignOut}>
-            <ListItemText primary="Sign Out" />
+          <ListItem onClick={handleSignOut}>
+            <ListItemText primary="Sign Out" sx={{ color: "#FFFFFF" }} />
           </ListItem>
         </>
       )}
-    </List>
+    </>
   );
 
   return (
@@ -90,7 +90,7 @@ export default function Navbar() {
           Studenthub
         </Typography>
 
-        {isMobile  ? (
+        {isMobile ? (
           <>
             <IconButton
               edge="start"
@@ -104,39 +104,19 @@ export default function Navbar() {
               anchor="left"
               open={drawerOpen}
               onClose={toggleDrawer(false)}
+              PaperProps={{
+                sx: { bgcolor: "#222831", color: "#FFFFFF" },
+              }}
             >
-              {drawerContent}
+              <List>{renderMenuItems()}</List>
             </Drawer>
           </>
         ) : (
-          <>
-            <Button color="inherit" component={Link} href="/dashboard">
-              Home
-            </Button>
-            <Button color="inherit" component={Link} href="/flashcards">
-              Flashcards
-            </Button>
-
-            {!user ? (
-              <>
-                <Button color="inherit" component={Link} href="/sign-in">
-                  Login
-                </Button>
-                <Button color="inherit" component={Link} href="/sign-up">
-                  Sign Up
-                </Button>
-              </>
-            ) : (
-              <>
-                <Typography variant="body1" sx={{ marginRight: 2 }}>
-                  {user.displayName || "User"}
-                </Typography>
-                <Button color="inherit" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </>
-            )}
-          </>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <List sx={{ display: "flex", flexDirection: "row" }}>
+              {renderMenuItems()}
+            </List>
+          </Box>
         )}
       </Toolbar>
     </AppBar>

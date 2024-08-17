@@ -1,14 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import app from "@/firebase";
 import Navbar from "@/app/Navbar";
+import Link from "next/link";
 import {
   Container,
   Box,
@@ -17,39 +10,64 @@ import {
   Button,
   Paper,
 } from "@mui/material";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+  OAuthProvider,
+} from "firebase/auth";
 import { useRouter } from "next/navigation";
-// import App from "next/app";
+import { auth } from "@/firebase"; 
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
   const router = useRouter();
-  // const [passwordless, setPasswordless] = useState(false);
 
-  const auth = getAuth(app);
-  const googleProvider = new GoogleAuthProvider();
-
-  const handleSignIn = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setError("");
-  };
 
-  const handleSignInWithPassword = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setSuccessMessage("Sign-in successful! Redirecting to Homepage...");
-      router.push("/dashboard");
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      setSuccessMessage("Sign-up successful! Redirecting to sign-in page...");
+      setTimeout(() => {
+        router.push("/sign-in");
+      }, 3000);
     } catch (error) {
       setError(error.message);
     }
   };
 
-
   const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth, provider);
+      setSuccessMessage(
+        "Sign-up with Google successful! Redirecting to sign-in page..."
+      );
+      setTimeout(() => {
+        router.push("/sign-in");
+      }, 3000);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    const provider = new OAuthProvider("apple.com");
+    try {
+      await signInWithPopup(auth, provider);
+      setSuccessMessage(
+        "Sign-up with Apple successful! Redirecting to sign-in page..."
+      );
+      setTimeout(() => {
+        router.push("/sign-in");
+      }, 3000);
     } catch (error) {
       setError(error.message);
     }
@@ -64,7 +82,7 @@ export default function SignUpPage() {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        marginTop: "10px",
+        marginTop: "20px",
       }}
     >
       <Navbar />
@@ -78,7 +96,7 @@ export default function SignUpPage() {
         }}
       >
         <Box
-          sx={{
+          x={{
             width: "90%",
             textAlign: "center",
             // padding: "2rem",
@@ -88,28 +106,28 @@ export default function SignUpPage() {
           alignItems="center"
           justifyContent="center"
         >
-          <Typography variant="h4" gutterBottom sx={{ mb: 5 }}>
-            Sign In
+          <Typography variant="h4" gutterBottom >
+            Sign Up
           </Typography>
           {error && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+            <Typography variant="body1" color="error" gutterBottom>
               {error}
             </Typography>
           )}
-          {setSuccessMessage && (
+          {successMessage && (
             <Typography variant="body1" color="success.main" gutterBottom>
               {successMessage}
             </Typography>
           )}
-          <Box component="form" onSubmit={handleSignIn}>
+          <Box component="form" onSubmit={handleSignUp}>
             <TextField
+              variant="outlined"
               label="Email"
               type="email"
-              variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
-              sx={{ mb: 2 }}
+              margin="normal"
               required
             />
             <TextField
@@ -119,43 +137,66 @@ export default function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
-              sx={{ mb: 2 }}
+              margin="normal"
               required
             />
             <Button
+              type="submit"
               variant="contained"
-              onClick={handleSignInWithPassword}
+              color="primary"
               sx={{
+                mt: 2,
                 backgroundColor: "#30475E",
                 color: "#FFF",
                 mb: 2,
                 "&:hover": {
                   backgroundColor: "#2c3e50",
+                  cursor: "pointer",
                 },
-                cursor: "pointer"
               }}
               fullWidth
             >
-              Sign In
+              Sign Up with Email
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleGoogleSignIn}
-              sx={{
-                backgroundColor: "#DB4437",
-                color: "#FFF",
-                "&:hover": {
-                  backgroundColor: "#c1351d",
-                },
-                cursor: "pointer"
-              }}
-              fullWidth
-            >
-              Sign In with Google
-            </Button>
-            <Typography variant="body2" sx={{ mt: 4 }}>
+          </Box>
+
+          <Typography variant="h6" >
+            Or sign up with
+          </Typography>
+
+          <Button
+            variant="outlined"
+            sx={{
+              mt: 2,
+              width: "100%",
+              backgroundColor: "#4285F4",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#357ae8" },
+              cursor: "pointer",
+            }}
+            onClick={handleGoogleSignIn}
+          >
+            Continue with Google
+          </Button>
+
+          <Button
+            variant="outlined"
+            sx={{
+              mt: 2,
+              width: "100%",
+              backgroundColor: "#000",
+              color: "#fff",
+              "&:hover": { backgroundColor: "#333" },
+              cursor: "pointer",
+            }}
+            onClick={handleAppleSignIn}
+          >
+            Continue with Apple
+          </Button>
+
+          <Typography variant="body2" sx={{ mt: 4 }}>
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" passHref>
+              <Link href="/sign-in" passHref>
                 <Typography
                   component="a"
                   sx={{
@@ -164,13 +205,10 @@ export default function SignUpPage() {
                     cursor: "pointer",
                   }}
                 >
-                  Sign up
+                  Login
                 </Typography>
               </Link>
             </Typography>
-            
-           
-          </Box>
         </Box>
       </Paper>
     </Container>

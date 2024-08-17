@@ -17,7 +17,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import React, { useEffect, useState } from "react";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebase";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
@@ -35,13 +34,12 @@ export default function Navbar() {
   }, []);
 
   const handleSignOut = async () => {
-    signOut(auth)
-      .then(() => {
-        router.push("./sign-in");
-      })
-      .catch((error) => {
-        console.error("sign-out error:", error);
-      });
+    try {
+      await signOut(auth);
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Sign-out error:", error);
+    }
   };
 
   const toggleDrawer = (open) => () => {
@@ -51,32 +49,35 @@ export default function Navbar() {
   const renderMenuItems = () => (
     <>
       <ListItem>
-        <Button onClick={() => router.push("/dashboard")}> Home </Button>
+        <Button onClick={() => router.push("/dashboard")} aria-label="Home">
+          Home
+        </Button>
       </ListItem>
       <ListItem>
-        <Button onClick={() => router.push("/flashcards")}> Flashcards </Button>
+        <Button onClick={() => router.push("/flashcards")} aria-label="Flashcards">
+          Flashcards
+        </Button>
       </ListItem>
       {!user ? (
-        <>
-          <ListItem>
-            <Button onClick={() => router.push("/sign-in")}> SignIn </Button>
-          </ListItem>
-          <ListItem>
-            <Button onClick={() => router.push("/sign-up")}> SignUp</Button>
-          </ListItem>
-        </>
+        <ListItem>
+          <Box sx={{ display: "flex", gap: 2}}>
+            <Button onClick={() => router.push("/sign-in")} aria-label="Sign-In">
+              Login
+            </Button>
+            <Button onClick={() => router.push("/sign-up")} aria-label="Sign-Up">
+              SignUp
+            </Button>
+          </Box>
+        </ListItem>
       ) : (
         <>
           <ListItem>
-            <Typography
-              variant="body1"
-              sx={{ marginRight: 2, color: "#FFFFFF" }}
-            >
+            <Typography variant="body1" sx={{ marginRight: 2, color: "#FFFFFF" }}>
               {user.displayName || "User"}
             </Typography>
           </ListItem>
-          <ListItem onClick={handleSignOut}>
-            <ListItemText primary="Sign Out" sx={{ color: "#FFFFFF" }} />
+          <ListItem button onClick={handleSignOut}>
+            <ListItemText primary="SignOut" sx={{ color: "#FFFFFF" }} />
           </ListItem>
         </>
       )}

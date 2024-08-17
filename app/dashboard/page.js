@@ -23,7 +23,7 @@ const features = [
     title: "Overview",
     icon: <DashboardIcon />,
     description: "View your overall performance and statistics.",
-    path: "/",
+    path: "/coming-soon",
   },
   {
     id: 2,
@@ -43,31 +43,36 @@ const features = [
     id: 4,
     title: "Payments",
     icon: <PaymentIcon />,
-    description: "Manage your payments and transactions.",
+    description: "Manage Subscription.",
+    path: "./subscription"
   },
   {
     id: 5,
     title: "Profile",
     icon: <AccountCircleIcon />,
     description: "Update your profile information.",
+    path: "/coming-soon",
   },
   {
     id: 6,
     title: "Settings",
     icon: <SettingsIcon />,
     description: "Configure application settings.",
+    path: "/coming-soon",
   },
   {
     id: 8,
     title: "Quiz",
     icon: <QuizIcon />,
     description: "Take quizzes to test your knowledge.",
+    path: "/coming-soon",
   },
   {
     id: 9,
     title: "Rate Professor",
     icon: <StarIcon />,
     description: "Rate your professors and provide feedback.",
+    path: "/coming-soon",
   },
   // { id: 5, title: 'Subscriptions', icon: <SubscriptionsIcon />, description: 'Manage your subscriptions and billing.' },
 ];
@@ -91,7 +96,8 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, [router]);
 
-  const handleFeatureClick = (path) => {
+  const handleFeatureClick = (path, e) => {
+    e.preventDefault();
     router.push(path);
   };
   return (
@@ -121,7 +127,7 @@ const Dashboard = () => {
                   cursor: "pointer",
                   backgroundColor: "#30475E",
                 }}
-                onClick={() => handleFeatureClick(feature.path)}
+                onClick={(e) => handleFeatureClick(feature.path,e)}
               >
                 <div style={{ fontSize: "40px", marginBottom: "10px" }}>
                   {feature.icon}

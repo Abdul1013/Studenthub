@@ -14,14 +14,14 @@ export default function Flashcards() {
   const [user, setUser] = useState(null);
   const router = useRouter();
 
-  // Handle user authentication
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
       } else {
-        router.push("/signin");
+        router.push("/sign-in");
       }
     });
 

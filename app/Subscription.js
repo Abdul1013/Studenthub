@@ -16,7 +16,8 @@ export const Subscription = () => {
     {
       id: 1,
       title: "Basic Plan",
-      price: "0 NGN",
+      price: "free",
+      priceId: "price_1HhXHdJFF3EaQy",
       feature1: "Access to basic features",
       feature2: "Limited flashcard creation",
       feature3: "Community support",
@@ -25,6 +26,7 @@ export const Subscription = () => {
       id: 2,
       title: "Pro Plan",
       price: "500 NGN",
+      priceId: "price_1HhXHdJFF3EaQy2",
       feature1: "Unlimited flashcard creation",
       feature2: "AI-generated flashcards",
       feature3: "Priority support",
@@ -33,13 +35,14 @@ export const Subscription = () => {
       id: 3,
       title: "Enterprise Plan",
       price: "1500 NGN",
+      priceId: "price_1HhXHdJFF3EaQy3", 
       feature1: "Custom solutions",
       feature2: "Access to Student-Planner App",
       feature3: "Advanced analytics",
     },
   ];
 
-  const handleSubmit = async (planId) => {
+  const handleSubmit = async (priceId) => {
     setLoading(true);
 
     try {
@@ -48,7 +51,7 @@ export const Subscription = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify({ priceId }),
       });
 
       const checkoutSessionJson = await res.json();
@@ -108,7 +111,7 @@ export const Subscription = () => {
 
             <Button
               variant="contained"
-              onClick={() => handleSubmit(item.id)}
+              onClick={() => handleSubmit(item.priceId)}
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
               disabled={loading}
             >

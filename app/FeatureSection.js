@@ -71,7 +71,7 @@ export const FeatureSection = () => {
             elevation={3}
             style={{
               padding: 16,
-              borderRadius: 2,
+              borderRadius: 10,
               textAlign: "center",
               backgroundColor: "#C1A57B",
             }}
@@ -92,12 +92,12 @@ export const FeatureSection = () => {
                 {item.feature3}
               </Typography>
             )}
-            <Button
+            {/* <Button
               variant="contained"
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
             >
               Learn More
-            </Button>
+            </Button> */}
           </Paper>
         </Grid>
       ))}

@@ -26,7 +26,7 @@ const ResultPage = () => {
 
       try {
         const res = await fetch(
-          `/api/checkout_sessions?session_id=${session_id}`
+          `/api/checkout_sessions?session_id=${session_id}` //or sessionId if initial doesn't work
         );
         
         const sessionData = await res.json();
@@ -76,7 +76,7 @@ const ResultPage = () => {
           <Box sx={{ mt: 2 }}>
             <Typography variant="h6">Subscription ID: {session.id}</Typography>
             <Typography variant="h6">
-              Subscription Date: {formattedDate}
+              Subscription Date: {session.id}
             </Typography>
             <Typography variant="h6">
               Subscription Status: {session.status}

@@ -37,12 +37,12 @@ export default function Navbar() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Studenthub
         </Typography>
+        <Button color="inherit" component={Link} href="/dashboard">
+          Home
+        </Button>
 
         <Button color="inherit" component={Link} href="/flashcards">
           Flashcards
-        </Button>
-        <Button color="inherit" component={Link} href="/rate-professor">
-          Rate Professor
         </Button>
 
         {!user ? (

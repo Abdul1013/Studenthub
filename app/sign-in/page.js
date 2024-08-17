@@ -6,7 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { app } from "@/firebase";
+import app  from "@/firebase";
 import Navbar from "@/app/Navbar";
 import {
   Container,
@@ -32,7 +32,7 @@ export default function SignUpPage() {
   const handleSignInWithPassword = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push("/generate")
+      router.push("/dashboard")
     } catch (error) {
       setError(error.message);
     }

@@ -1,13 +1,14 @@
-import { Container, Box, Typography, Button, Grid, Paper } from "@mui/material";
+"use client";
+import { Container, Box, Typography, Button, Grid, Paper, TextField } from "@mui/material";
 import Head from "next/head";
 import Navbar from "./Navbar";
 import { FeatureSection } from "./FeatureSection";
 import { Subscription } from "./Subscription";
-// import getStripe from "@/utils/get-stripe";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
 
-  
   return (
     <Container maxWidth="lg">
       <Head>
@@ -60,6 +61,7 @@ export default function Home() {
             py: { xs: 1, sm: 2 },
             fontSize: { xs: "0.875rem", sm: "1rem" },
           }}
+          onClick={() => router.push("./dashboard")}
         >
           Get Started
         </Button>
@@ -77,7 +79,7 @@ export default function Home() {
         >
           Features
         </Typography>
-        <FeatureSection type="features"/>
+        <FeatureSection type="features" />
       </Box>
 
       <Box marginTop={6}>
@@ -92,7 +94,79 @@ export default function Home() {
         >
           Pricing
         </Typography>
-        <Subscription/>
+        <Subscription />
+      </Box>
+
+
+      {/* <Box marginTop={6}> faq section
+        <Typography
+          variant="h3"
+          sx={{
+            mt: 4,
+            mb: 2,
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+            textAlign: "center",
+          }}
+        >
+          Frequently Asked Questions
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          FAQ Items...
+        </Grid>
+      </Box> */}
+
+      {/* Newsletter Signup Section */}
+      <Box
+        marginTop={6}
+        textAlign="center"
+        bgcolor="#ECECEC"
+        padding={4}
+        borderRadius={2}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 2,
+            fontWeight: "bold",
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+          }}
+        >
+          Subscribe to Our Newsletter
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            mb: 4,
+            fontSize: { xs: "1rem", sm: "1.25rem" },
+          }}
+        >
+          Stay updated with the latest features and tips to enhance your study
+          experience.
+        </Typography>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            // Handle the newsletter signup logic here
+          }}
+        >
+          <TextField
+            required
+            label="Email Address"
+            variant="outlined"
+            type="email"
+            sx={{ mr: 2, width: { xs: "100%", sm: "300px" } }}
+          />
+          <Button
+            variant="contained"
+            type="submit"
+            sx={{
+              backgroundColor: "#30475E",
+              "&:hover": { backgroundColor: "#2C3E50" },
+            }}
+          >
+            Subscribe
+          </Button>
+        </form>
       </Box>
     </Container>
   );

@@ -18,9 +18,11 @@ import {
   Card,
   DialogActions,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import { collection, addDoc } from "firebase/firestore"; // Correctly import from firestore
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // Correctly import from auth
+import { collection, addDoc } from "firebase/firestore"; 
+import { getAuth, onAuthStateChanged } from "firebase/auth"; 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Navbar from "../Navbar";
@@ -34,6 +36,10 @@ export default function Generate() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +91,9 @@ export default function Generate() {
 
   const saveFlashcards = async () => {
     if (!deckName.trim()) {
-      alert("Please enter a name for your flashcard set.");
+      setSnackbarMessage("Please enter a name for your flashcard set.");
+      setSnackbarSeverity("warning");
+      setSnackbarOpen(true);
       return;
     }
 
@@ -95,7 +103,9 @@ export default function Generate() {
       const user = getAuth().currentUser;
 
       if (!user) {
-        alert("You need to be signed in to save flashcards.");
+        setSnackbarMessage("You need to be signed in to save flashcards.");
+        setSnackbarSeverity("warning");
+        setSnackbarOpen(true);
         return;
       }
 
@@ -108,13 +118,19 @@ export default function Generate() {
 
       await addDoc(collection(db, "flashcards"), flashcardSet);
 
-      alert("Flashcards saved successfully!");
+      setSnackbarMessage("Flashcards saved successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
       handleClose();
-      setDeckName(""); // Clear the input field after saving
+      setDeckName("");
       router.push("/flashcards");
     } catch (error) {
       console.error("Error saving flashcards:", error);
-      alert("An error occurred while saving flashcards. Please try again.");
+      setSnackbarMessage(
+        "An error occurred while saving flashcards. Please try again."
+      );
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     } finally {
       setSaving(false);
     }
@@ -263,6 +279,20 @@ export default function Generate() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={10000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

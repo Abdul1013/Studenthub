@@ -35,11 +35,11 @@ export default function SignUpPage() {
       try {
         const result = await getRedirectResult(auth);
         if (result) {
-          // User signed in successfully.
           setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
           router.push("/dashboard");
         }
       } catch (error) {
+        console.error("Redirect result error:", error);
         setError(error.message);
       }
     };
@@ -58,6 +58,7 @@ export default function SignUpPage() {
       setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
       router.push("/dashboard");
     } catch (error) {
+      console.error("Email sign-in error:", error);
       setError(error.message);
     }
   };
@@ -65,8 +66,8 @@ export default function SignUpPage() {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithRedirect(auth, googleProvider);
-      // Redirect will occur, no need to push to dashboard here.
     } catch (error) {
+      console.error("Google sign-in error:", error);
       setError(error.message);
     }
   };

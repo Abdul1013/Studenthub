@@ -1,34 +1,48 @@
 "use client";
-import { Container, Box, Typography, Button, Grid, Paper, TextField } from "@mui/material";
+import { Container, Box, Typography, Button, TextField } from "@mui/material";
 import Head from "next/head";
 import Navbar from "./Navbar";
 import { FeatureSection } from "./FeatureSection";
 import { Subscription } from "./Subscription";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { analytics } from "@/firebase";
+import { analytics } from "@/firebase"; // Import analytics
+import { logEvent } from "firebase/analytics"; // Import logEvent
+import Footer from "./Footer";
 
 export default function Home() {
   const router = useRouter();
+  // const analytics = getAnalytics(); // Ensure analytics is initialized
   useEffect(() => {
-    const logEvent = (url) => {
-      analytics.logEvent("page_view", {
-        page_path: url,
-      });
+    // Log an initial page view
+    const logPageView = (url) => {
+      if (analytics) {
+        logEvent(analytics, "page_view", {
+          page_path: url,
+        });
+      } else {
+        console.warn("Analytics not initialized.");
+      }
     };
 
-    logEvent(window.location.pathname);
+    logPageView(window.location.pathname);
 
-    // Log page view on route change
-    router.events.on("routeChangeComplete", logEvent);
+    const handleRouteChange = (url) => {
+      logPageView(url);
+    };
 
-    // Cleanup event listener on unmount
+    const originalPush = router.push;
+    router.push = (url) => {
+      handleRouteChange(url);
+      return originalPush.call(router, url);
+    };
+
     return () => {
-      router.events.off("routeChangeComplete", logEvent);
     };
-  }, [router.events]);
+  }, [ router]);
 
   return (
-    <Container maxWidth="lg">
+    <Container>
       <Head>
         <title>StudentHub</title>
         <meta name="description" content="Create flashcards from your text" />
@@ -115,77 +129,7 @@ export default function Home() {
         <Subscription />
       </Box>
 
-
-      {/* <Box marginTop={6}> faq section
-        <Typography
-          variant="h3"
-          sx={{
-            mt: 4,
-            mb: 2,
-            fontSize: { xs: "1.5rem", sm: "2rem" },
-            textAlign: "center",
-          }}
-        >
-          Frequently Asked Questions
-        </Typography>
-        <Grid container spacing={2} justifyContent="center">
-          FAQ Items...
-        </Grid>
-      </Box> */}
-
-      {/* Newsletter Signup Section */}
-      <Box
-        marginTop={6}
-        textAlign="center"
-        bgcolor="#ECECEC"
-        padding={4}
-        borderRadius={2}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            fontWeight: "bold",
-            fontSize: { xs: "1.5rem", sm: "2rem" },
-          }}
-        >
-          Subscribe to Our Newsletter
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            mb: 4,
-            fontSize: { xs: "1rem", sm: "1.25rem" },
-          }}
-        >
-          Stay updated with the latest features and tips to enhance your study
-          experience.
-        </Typography>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            // Handle the newsletter signup logic here
-          }}
-        >
-          <TextField
-            required
-            label="Email Address"
-            variant="outlined"
-            type="email"
-            sx={{ mr: 2, width: { xs: "100%", sm: "300px" } }}
-          />
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{
-              backgroundColor: "#30475E",
-              "&:hover": { backgroundColor: "#2C3E50" },
-            }}
-          >
-            Subscribe
-          </Button>
-        </form>
-      </Box>
+      <Footer />
     </Container>
   );
 }

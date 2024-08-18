@@ -109,7 +109,7 @@ export const Subscription = () => {
               {item.feature3}
             </Typography>
 
-            <Button
+            {/* <Button
               variant="contained"
               onClick={() => handleSubmit(item.priceId)}
               style={{ marginTop: 16, backgroundColor: "#30475E" }}
@@ -120,7 +120,7 @@ export const Subscription = () => {
               ) : (
                 "Subscribe"
               )}
-            </Button>
+            </Button> */}
           </Paper>
         </Grid>
       ))}

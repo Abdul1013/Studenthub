@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   getAuth,
+  getRedirectResult,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
 } from "firebase/auth";
 import app from "@/firebase";
 import Navbar from "@/app/Navbar";
@@ -29,6 +30,23 @@ export default function SignUpPage() {
   const auth = getAuth(app);
   const googleProvider = new GoogleAuthProvider();
 
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          // User signed in successfully.
+          setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    handleRedirectResult();
+  }, [auth, router]);
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     setError("");
@@ -46,7 +64,8 @@ export default function SignUpPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithRedirect(auth, googleProvider);
+      // Redirect will occur, no need to push to dashboard here.
     } catch (error) {
       setError(error.message);
     }

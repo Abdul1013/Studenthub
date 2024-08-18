@@ -113,7 +113,7 @@ export default function Footer() {
         </Grid>
         <Box sx={{ textAlign: "center", mt: 3 }}>
           <Typography variant="body2" color="inherit">
-            &copy; {new Date().getFullYear()} Studenthub. All rights reserved.
+            &copy; {new Date().getFullYear()} Studenthub. All rights reserved. @abdulthedev
           </Typography>
         </Box>
       </Container>

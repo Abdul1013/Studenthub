@@ -6,13 +6,13 @@ import { FeatureSection } from "./FeatureSection";
 import { Subscription } from "./Subscription";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { analytics } from "@/firebase"; // Import analytics
-import { logEvent } from "firebase/analytics"; // Import logEvent
+import { analytics } from "@/firebase"; 
+import { logEvent } from "firebase/analytics"; 
 import Footer from "./Footer";
 
 export default function Home() {
   const router = useRouter();
-  // const analytics = getAnalytics(); // Ensure analytics is initialized
+
   useEffect(() => {
     // Log an initial page view
     const logPageView = (url) => {

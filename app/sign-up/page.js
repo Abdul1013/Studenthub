@@ -17,7 +17,7 @@ import {
   OAuthProvider,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/firebase"; 
+import { auth } from "@/firebase";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -30,6 +30,7 @@ export default function SignUpPage() {
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -81,8 +82,8 @@ export default function SignUpPage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: "100vh",
-        marginTop: "20px",
+        maxHeight: "100vh",
+        marginTop: "100px",
       }}
     >
       <Navbar />
@@ -96,38 +97,37 @@ export default function SignUpPage() {
         }}
       >
         <Box
-          x={{
-            width: "90%",
+          sx={{
+            width: "100%",
             textAlign: "center",
-            // padding: "2rem",
           }}
           display="flex"
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
         >
-          <Typography variant="h4" gutterBottom >
+          <Typography variant="h4" gutterBottom sx={{ mb: 5 }}>
             Sign Up
           </Typography>
           {error && (
-            <Typography variant="body1" color="error" gutterBottom>
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
               {error}
             </Typography>
           )}
           {successMessage && (
-            <Typography variant="body1" color="success.main" gutterBottom>
+            <Typography variant="body1" color="success.main" sx={{ mb: 2 }}>
               {successMessage}
             </Typography>
           )}
           <Box component="form" onSubmit={handleSignUp}>
             <TextField
-              variant="outlined"
               label="Email"
               type="email"
+              variant="outlined"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
-              margin="normal"
+              sx={{ mb: 2 }}
               required
             />
             <TextField
@@ -137,22 +137,20 @@ export default function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
-              margin="normal"
+              sx={{ mb: 2 }}
               required
             />
             <Button
               type="submit"
               variant="contained"
-              color="primary"
               sx={{
-                mt: 2,
                 backgroundColor: "#30475E",
                 color: "#FFF",
                 mb: 2,
                 "&:hover": {
                   backgroundColor: "#2c3e50",
-                  cursor: "pointer",
                 },
+                cursor: "pointer",
               }}
               fullWidth
             >
@@ -160,55 +158,59 @@ export default function SignUpPage() {
             </Button>
           </Box>
 
-          <Typography variant="h6" >
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
             Or sign up with
           </Typography>
 
           <Button
-            variant="outlined"
+            variant="contained"
+            onClick={handleGoogleSignIn}
             sx={{
-              mt: 2,
-              width: "100%",
               backgroundColor: "#4285F4",
-              color: "#fff",
-              "&:hover": { backgroundColor: "#357ae8" },
+              color: "#FFF",
+              mb: 2,
+              "&:hover": {
+                backgroundColor: "#357ae8",
+              },
               cursor: "pointer",
             }}
-            onClick={handleGoogleSignIn}
+            fullWidth
           >
             Continue with Google
           </Button>
 
           <Button
-            variant="outlined"
+            variant="contained"
+            onClick={handleAppleSignIn}
             sx={{
-              mt: 2,
-              width: "100%",
               backgroundColor: "#000",
-              color: "#fff",
-              "&:hover": { backgroundColor: "#333" },
+              color: "#FFF",
+              mb: 2,
+              "&:hover": {
+                backgroundColor: "#333",
+              },
               cursor: "pointer",
             }}
-            onClick={handleAppleSignIn}
+            fullWidth
           >
             Continue with Apple
           </Button>
 
           <Typography variant="body2" sx={{ mt: 4 }}>
-              Don&apos;t have an account?{" "}
-              <Link href="/sign-in" passHref>
-                <Typography
-                  component="a"
-                  sx={{
-                    color: "primary.main",
-                    textDecoration: "underline",
-                    cursor: "pointer",
-                  }}
-                >
-                  Login
-                </Typography>
-              </Link>
-            </Typography>
+            Already have an account?{" "}
+            <Link href="/sign-in" passHref>
+              <Typography
+                component="a"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                }}
+              >
+                Sign In
+              </Typography>
+            </Link>
+          </Typography>
         </Box>
       </Paper>
     </Container>

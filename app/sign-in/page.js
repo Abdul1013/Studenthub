@@ -35,17 +35,34 @@ export default function SignUpPage() {
       try {
         const result = await getRedirectResult(auth);
         if (result) {
+          console.log("Google Sign-In successful: ", result.user);
           setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
           router.push("/dashboard");
+        } else {
+          console.log("No redirect result. Staying on the sign-in page.");
         }
       } catch (error) {
         console.error("Redirect result error:", error);
-        setError(error.message);
+        setError(getErrorMessage(error.code));
       }
     };
-
+  
     handleRedirectResult();
   }, [auth, router]);
+  
+  useEffect(() => {
+    const checkAuthState = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is logged in:", user);
+        router.push("/dashboard");
+      } else {
+        console.log("No user logged in. Staying on sign-in page.");
+      }
+    });
+  
+    return () => checkAuthState(); // Cleanup subscription on unmount.
+  }, [auth, router]);
+  
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -59,7 +76,7 @@ export default function SignUpPage() {
       router.push("/dashboard");
     } catch (error) {
       console.error("Email sign-in error:", error);
-      setError(error.message);
+      setError(getErrorMessage(error.code));
     }
   };
 
@@ -68,9 +85,27 @@ export default function SignUpPage() {
       await signInWithRedirect(auth, googleProvider);
     } catch (error) {
       console.error("Google sign-in error:", error);
-      setError(error.message);
+      setError(getErrorMessage(error.code));
     }
   };
+
+  const getErrorMessage = (error) => {
+    switch (error) {
+      case "auth/invalid-email":
+        return "Invalid email address. Please check your email and try again.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Please contact support.";
+      case "auth/user-not-found":
+        return "No account found with this email. Please sign up.";
+      case "auth/wrong-password":
+        return "Incorrect password. Please try again.";
+      case "auth/popup-closed-by-user":
+        return "Google sign-in was canceled. Please try again.";
+      default:
+        return "An unexpected error occurred. Please try again later.";
+    }
+  };
+  
 
   return (
     <Container
@@ -96,7 +131,7 @@ export default function SignUpPage() {
       >
         <Box
           sx={{
-            width: "90%",
+            width: "100%",
             textAlign: "center",
           }}
           display="flex"
@@ -113,7 +148,7 @@ export default function SignUpPage() {
             </Typography>
           )}
           {successMessage && (
-            <Typography variant="body1" color="success.main" gutterBottom>
+            <Typography variant="body1" color="success.main" gutterBottom sx={{ mb: 2 }}>
               {successMessage}
             </Typography>
           )}

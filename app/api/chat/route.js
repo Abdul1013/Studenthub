@@ -69,11 +69,17 @@ export async function POST(req) {
             for await (const chunk of completion) {
                 const content = chunk.choice[0]?.delta?.content
                 if(content){
-                    
+                    const text = enconder.encode(content)
+                    controller.enqueue(text)
                 }
             }
+        }catch (err){
+            controller.error(err)
+        }finally{
+            controller.close()
         }
         
-    }
+    },
   })
+  return new NextResponse(Stream);
 }

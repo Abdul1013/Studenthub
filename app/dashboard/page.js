@@ -72,7 +72,7 @@ const features = [
     title: "Rate Professor",
     icon: <StarIcon />,
     description: "Rate your professors and provide feedback.",
-    path: "/coming-soon",
+    path: "/RateProffesor",
   },
   // { id: 5, title: 'Subscriptions', icon: <SubscriptionsIcon />, description: 'Manage your subscriptions and billing.' },
 ];

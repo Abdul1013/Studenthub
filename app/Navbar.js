@@ -55,7 +55,7 @@ export default function Navbar() {
       </ListItem>
       <ListItem>
         <Button onClick={() => router.push("/flashcards")} aria-label="Flashcards">
-          Flashcards
+          Studycards
         </Button>
       </ListItem>
       {!user ? (

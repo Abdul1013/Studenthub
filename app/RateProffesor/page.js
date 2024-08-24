@@ -57,38 +57,29 @@ const Professor = () => {
       flexDirection="row"
       justifyContent="space-between"
       alignItems="center"
-      // p={4}
+      p={4}
     >
       {/* Left side with "Rate My Professor" */}
       <Box flex={1} display="flex" justifyContent="center" alignItems="center">
-        <Typography variant="h3" fontWeight="bold" color={"blueviolet"}>
-         AI Rate My Professor 👨🏾‍💻📖
+        <Typography variant="h3" fontWeight="bold" color="blueviolet">
+          AI Rate My Professor 👨🏾‍💻📖
         </Typography>
       </Box>
 
       {/* Right side with the chat interface */}
-      <Box
-        // flex={2}
-        // display="flex"
-        // flexDirection="column"
-        // justifyContent="center"
-        // alignItems="center"
-        // boxShadow={3}
-        // borderRadius={2}
-        // bgcolor="background.paper"
-        // p={1}
-      >
+      <Box flex={2} display="flex" justifyContent="center" alignItems="center">
         <Stack
           direction="column"
           width="500px"
           height="600px"
           p={2}
-          spacing={1}
-          bgcolor={"grey"}
-          borderRadius={"10px"}
+          spacing={2}
+          bgcolor="grey.200"
+          borderRadius="10px"
+          boxShadow={3}
         >
           <Stack
-            direction={"column"}
+            direction="column"
             spacing={2}
             flexGrow={1}
             overflow="auto"
@@ -118,7 +109,7 @@ const Professor = () => {
               </Box>
             ))}
           </Stack>
-          <Stack direction={"row"} spacing={2}>
+          <Stack direction="row" spacing={2}>
             <TextField
               label="Type your message"
               fullWidth

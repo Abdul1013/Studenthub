@@ -1,32 +1,41 @@
+// import{ fetch} from "node-fetch"; // Ensure node-fetch is installed
 import { NextResponse } from "next/server";
 import { Pinecone } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
 
+// Define the system prompt for the assistant
 const systemPrompt = `
 You are a Rate My Professor agent to help students find classes by answering their questions.
 For every user question, return the top 3 professors that match the query.
 Use their details to help answer the question if needed.
 `;
 
+// Define the POST request handler
 export async function POST(req) {
   try {
-    const data = await req.json();
+    const data = await req.json(); // Parse the incoming request data
 
-    // Initializing API clients
+    // Initialize Pinecone client
     const pc = new Pinecone();
     await pc.init({
       apiKey: process.env.PINECONE_API_KEY,
       environment: "us-east1-gcp", // Adjust according to your environment
     });
     const index = pc.Index("rag");
+
+    // Initialize OpenAI client
     const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
+    // Get the last message content from the request data
     const text = data[data.length - 1].content;
+
+    // Generate an embedding for the input text
     const embedding = await openai.embeddings.create({
       model: "text-embedding-ada-002",
       input: text,
     });
 
+    // Query Pinecone for top 3 matches based on the embedding
     const results = await index.query({
       topK: 3,
       includeMetadata: true,
@@ -34,6 +43,7 @@ export async function POST(req) {
       namespace: "ns1",
     });
 
+    // Format the results into a string
     let resultString = "Returned Results:\n";
     results.matches.forEach((match) => {
       resultString += `
@@ -44,10 +54,12 @@ export async function POST(req) {
       \n`;
     });
 
+    // Prepare the conversation history with the results
     const lastMessageContent =
       data[data.length - 1].content + "\n" + resultString;
     const lastDataWithoutLastMessage = data.slice(0, data.length - 1);
 
+    // Generate a response using OpenAI
     const completion = await openai.chat.completions.create({
       messages: [
         { role: "system", content: systemPrompt },
@@ -58,6 +70,7 @@ export async function POST(req) {
       stream: true,
     });
 
+    // Stream the response back to the client
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();

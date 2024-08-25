@@ -1,116 +1,92 @@
-import { NextResponse } from "next/server";
-import { Pinecone } from "@pinecone-database/pinecone";
+import { Pinecone} from "@pinecone-database/pinecone";
 import OpenAI from "openai";
-
-// Ensure fetch is imported for environments that do not have it
 import fetch from "node-fetch";
-global.fetch = fetch; // This line ensures fetch is available globally
+import { config } from "dotenv";
+import fs from "fs";
+import path from "path";
 
-const systemPrompt = `
-You are a Rate My Professor agent to help students find classes by answering their questions.
-For every user question, return the top 3 professors that match the query.
-Use their details to help answer the question if needed.
-`;
+// Load environment variables from .env file
+config();
 
-export async function POST(req) {
+// Ensure fetch is available globally (for environments that don't have fetch)
+global.fetch = fetch;
+
+// Initialize Pinecone client
+const pinecone = new Pinecone();
+
+async function initializePinecone() {
   try {
-    const data = await req.json();
-
-    // Initializing API clients
-    const pinecone = new Pinecone();
     await pinecone.init({
       apiKey: process.env.PINECONE_API_KEY,
-      environment: process.env.PINECONE_ENVIRONMENT, // Ensure this is set in your environment variables
+      // environment: process.env.PINECONE_ENVIRONMENT,
     });
-
-    const index = pinecone.Index("rag");
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your environment variables
-    });
-
-    const text = data[data.length - 1].content;
-
-    // Fetch the embedding from OpenAI
-    const embeddingResponse = await openai.embeddings.create({
-      model: "text-embedding-ada-002",
-      input: text,
-    });
-
-    const embedding = embeddingResponse.data[0].embedding;
-
-    // Query Pinecone
-    const results = await index.query({
-      topK: 3,
-      includeMetadata: true,
-      vector: embedding,
-      namespace: "ns1",
-    });
-
-    let resultString = "Returned Results:\n";
-    results.matches.forEach((match) => {
-      resultString += `
-      Professor: ${match.id}
-      Review: ${match.metadata.review}
-      Subject: ${match.metadata.subject}
-      Stars: ${match.metadata.stars}
-      \n`;
-    });
-
-    const lastMessageContent =
-      data[data.length - 1].content + "\n" + resultString;
-    const lastDataWithoutLastMessage = data.slice(0, data.length - 1);
-
-    const completion = await openai.chat.completions.create({
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...lastDataWithoutLastMessage,
-        { role: "user", content: lastMessageContent },
-      ],
-      model: "gpt-3.5-turbo",
-      stream: true,
-    });
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        try {
-          for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-              const text = encoder.encode(content);
-              controller.enqueue(text);
-            }
-          }
-        } catch (err) {
-          controller.error(err);
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new NextResponse(stream);
+    console.log("Pinecone initialized successfully");
   } catch (error) {
-    let errorMessage = "An error occurred. Please try again later.";
-
-    // Handle specific error types
-    if (error.response) {
-      if (error.response.status === 429) {
-        errorMessage = "Quota exceeded: You have reached your usage limits.";
-      } else if (error.response.status === 403) {
-        errorMessage =
-          "Access denied: Please check your API key and permissions.";
-      }
-    } else if (error.message.includes("Pinecone")) {
-      errorMessage = "Pinecone error: " + error.message;
-    } else if (error.message.includes("OpenAI")) {
-      errorMessage = "OpenAI error: " + error.message;
-    }
-
-    // Log the error for debugging purposes
-    console.error("Error:", error);
-
-    // Return the error message as a plain text response
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    console.error("Error initializing Pinecone:", error);
   }
 }
+
+// Create a Pinecone index
+async function createIndex() {
+  try {
+    await pinecone.createIndex({
+      name: "rag",
+      dimension: 1536,
+      metric: "cosine",
+      environment: process.env.PINECONE_ENVIRONMENT,
+    });
+    console.log("Index created successfully");
+  } catch (error) {
+    console.error("Error creating index:", error);
+  }
+}
+
+// Process review data and insert into Pinecone
+async function processAndInsertData() {
+  try {
+    // Load review data
+    const dataPath = path.join(__dirname, "reviews.json");
+    const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+
+    const processedData = [];
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    // Create embeddings for each review
+    for (const review of data.reviews) {
+      const response = await client.embeddings.create({
+        input: review.review,
+        model: "text-embedding-ada-002", // Use an appropriate OpenAI embedding model
+      });
+      const embedding = response.data[0].embedding;
+      processedData.push({
+        id: review.professor,
+        values: embedding,
+        metadata: {
+          review: review.review,
+          subject: review.subject,
+          stars: review.stars,
+        },
+      });
+    }
+
+    // Insert the embeddings into the Pinecone index
+    const index = pinecone.Index("rag");
+    const upsertResponse = await index.upsert({
+      vectors: processedData,
+      namespace: "ns1",
+    });
+    console.log(`Upserted count: ${upsertResponse.upsertedCount}`);
+
+    // Print index statistics
+    const indexStats = await index.describeIndexStats();
+    console.log("Index statistics:", indexStats);
+  } catch (error) {
+    console.error("Error processing and inserting data:", error);
+  }
+}
+
+(async () => {
+  await initializePinecone();
+  await createIndex();
+  await processAndInsertData();
+})();

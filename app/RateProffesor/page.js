@@ -1,6 +1,13 @@
-"use client";
+"use client"
 import React, { useState } from "react";
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  Snackbar,
+} from "@mui/material";
 
 const Professor = () => {
   const [messages, setMessages] = useState([
@@ -10,6 +17,12 @@ const Professor = () => {
     },
   ]);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(""); // State to handle error message
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar state
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const sendMessage = async () => {
     setMessage("");
@@ -19,34 +32,56 @@ const Professor = () => {
       { role: "assistant", content: "" },
     ]);
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify([...messages, { role: "user", content: message }]),
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify([...messages, { role: "user", content: message }]),
+      });
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let result = "";
-
-    reader.read().then(function processText({ done, value }) {
-      if (done) {
-        return result;
+      if (!response.ok) {
+        if (response.status === 429) {
+          // Handle rate limit error
+          setError(
+            "You have exceeded your API usage quota. Please try again later."
+          );
+          setSnackbarOpen(true);
+          return;
+        } else {
+          setError("An error occurred while processing your request.");
+          setSnackbarOpen(true);
+          return;
+        }
       }
 
-      const text = decoder.decode(value || new Uint8Array(), { stream: true });
-      setMessages((messages) => {
-        let lastMessage = messages[messages.length - 1];
-        let otherMessages = messages.slice(0, messages.length - 1);
-        return [
-          ...otherMessages,
-          { ...lastMessage, content: lastMessage.content + text },
-        ];
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      reader.read().then(function processText({ done, value }) {
+        if (done) {
+          return result;
+        }
+
+        const text = decoder.decode(value || new Uint8Array(), {
+          stream: true,
+        });
+        setMessages((messages) => {
+          let lastMessage = messages[messages.length - 1];
+          let otherMessages = messages.slice(0, messages.length - 1);
+          return [
+            ...otherMessages,
+            { ...lastMessage, content: lastMessage.content + text },
+          ];
+        });
+        return reader.read().then(processText);
       });
-      return reader.read().then(processText);
-    });
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again later.");
+      setSnackbarOpen(true);
+    }
   };
 
   return (
@@ -122,6 +157,14 @@ const Professor = () => {
           </Stack>
         </Stack>
       </Box>
+
+      {/* Snackbar for error notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={error}
+      />
     </Box>
   );
 };

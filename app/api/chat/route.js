@@ -1,4 +1,4 @@
-import { Pinecone} from "@pinecone-database/pinecone";
+import { PineconeClient } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
 import fetch from "node-fetch";
 import { config } from "dotenv";
@@ -12,13 +12,13 @@ config();
 global.fetch = fetch;
 
 // Initialize Pinecone client
-const pinecone = new Pinecone();
+const pinecone = new PineconeClient();
 
 async function initializePinecone() {
   try {
     await pinecone.init({
       apiKey: process.env.PINECONE_API_KEY,
-      // environment: process.env.PINECONE_ENVIRONMENT,
+      environment: process.env.PINECONE_ENVIRONMENT,
     });
     console.log("Pinecone initialized successfully");
   } catch (error) {
@@ -33,7 +33,6 @@ async function createIndex() {
       name: "rag",
       dimension: 1536,
       metric: "cosine",
-      environment: process.env.PINECONE_ENVIRONMENT,
     });
     console.log("Index created successfully");
   } catch (error) {
@@ -44,8 +43,7 @@ async function createIndex() {
 // Process review data and insert into Pinecone
 async function processAndInsertData() {
   try {
-    // Load review data
-    const dataPath = path.join(__dirname, "reviews.json");
+    const dataPath = path.join(process.cwd(), "reviews.json");
     const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
 
     const processedData = [];
@@ -55,7 +53,7 @@ async function processAndInsertData() {
     for (const review of data.reviews) {
       const response = await client.embeddings.create({
         input: review.review,
-        model: "text-embedding-ada-002", // Use an appropriate OpenAI embedding model
+        model: "text-embedding-ada-002",
       });
       const embedding = response.data[0].embedding;
       processedData.push({
@@ -85,8 +83,9 @@ async function processAndInsertData() {
   }
 }
 
-(async () => {
+export async function POST(req, res) {
   await initializePinecone();
   await createIndex();
   await processAndInsertData();
-})();
+  res.status(200).json({ message: "Process completed successfully" });
+}

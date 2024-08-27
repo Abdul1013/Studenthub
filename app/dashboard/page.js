@@ -44,7 +44,7 @@ const features = [
     title: "Payments",
     icon: <PaymentIcon />,
     description: "Manage Subscription.",
-    path: "./subscription"
+    path: "./subscription",
   },
   {
     id: 5,
@@ -67,19 +67,19 @@ const features = [
     description: "Take quizzes to test your knowledge.",
     path: "/coming-soon",
   },
-  {
-    id: 9,
-    title: "Rate Professor",
-    icon: <StarIcon />,
-    description: "Rate your professors and provide feedback.",
-    path: "/RateProffesor",
-  },
+  // {
+  //   id: 9,
+  //   title: "Rate Professor",
+  //   icon: <StarIcon />,
+  //   description: "Rate your professors and provide feedback.",
+  //   path: "/RateProffesor",
+  // },
   // { id: 5, title: 'Subscriptions', icon: <SubscriptionsIcon />, description: 'Manage your subscriptions and billing.' },
 ];
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const Dashboard = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        setUsername(currentUser.displayName || currentUser.email)
+        setUsername(currentUser.displayName || currentUser.email);
       } else {
         router.push("/sign-in");
       }
@@ -103,7 +103,7 @@ const Dashboard = () => {
   return (
     <Container>
       <Navbar />
-      <Box sx={{mt:10}}>
+      <Box sx={{ mt: 10 }}>
         <Typography
           variant="h4"
           component="h1"
@@ -112,9 +112,16 @@ const Dashboard = () => {
         >
           Dashboard
         </Typography>
-        <Typography variant="h4" component="h1" gutterBottom style={{ marginTop: '20px' }}>
-                Welcome, {username}
-            </Typography>
+
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          style={{ marginTop: "20px" }}
+        >
+          Welcome, {username}
+        </Typography>
+
         <Grid container spacing={2}>
           {features.map((feature) => (
             <Grid item xs={12} sm={6} md={4} key={feature.id}>
@@ -127,7 +134,7 @@ const Dashboard = () => {
                   cursor: "pointer",
                   backgroundColor: "#30475E",
                 }}
-                onClick={(e) => handleFeatureClick(feature.path,e)}
+                onClick={(e) => handleFeatureClick(feature.path, e)}
               >
                 <div style={{ fontSize: "40px", marginBottom: "10px" }}>
                   {feature.icon}

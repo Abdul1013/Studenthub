@@ -13,8 +13,8 @@ import Footer from "./Footer";
 export default function Home() {
   const router = useRouter();
 
+  // firebase analytic
   useEffect(() => {
-    // Log an initial page view
     const logPageView = (url) => {
       if (analytics) {
         logEvent(analytics, "page_view", {

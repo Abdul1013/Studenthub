@@ -45,6 +45,7 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    e.preventDefault();
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -60,6 +61,7 @@ export default function SignUpPage() {
   };
 
   const handleAppleSignIn = async () => {
+    e.preventDefault();
     const provider = new OAuthProvider("apple.com");
     try {
       await signInWithPopup(auth, provider);
@@ -138,8 +140,19 @@ export default function SignUpPage() {
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               sx={{ mb: 2 }}
+              required/>
+
+            <TextField
+              label="Confirm Password"
+              variant="outlined"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              sx={{ mb: 2 }}
               required
             />
+
             <Button
               type="submit"
               variant="contained"

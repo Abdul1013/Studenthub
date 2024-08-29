@@ -8,13 +8,11 @@ import { Container, Grid, Paper, Typography, Box } from "@mui/material";
 import {
   Dashboard as DashboardIcon,
   Payment as PaymentIcon,
-  Subscriptions as SubscriptionsIcon,
   AccountCircle as AccountCircleIcon,
   Settings as SettingsIcon,
   Create as CreateIcon,
   ViewList as ViewListIcon,
   Quiz as QuizIcon,
-  Star as StarIcon,
 } from "@mui/icons-material";
 
 const features = [
@@ -67,14 +65,6 @@ const features = [
     description: "Take quizzes to test your knowledge.",
     path: "/coming-soon",
   },
-  // {
-  //   id: 9,
-  //   title: "Rate Professor",
-  //   icon: <StarIcon />,
-  //   description: "Rate your professors and provide feedback.",
-  //   path: "/RateProffesor",
-  // },
-  // { id: 5, title: 'Subscriptions', icon: <SubscriptionsIcon />, description: 'Manage your subscriptions and billing.' },
 ];
 
 const Dashboard = () => {

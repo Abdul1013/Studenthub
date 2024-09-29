@@ -79,17 +79,17 @@ export const FeatureSection = () => {
             <Typography variant="h5" component="h6">
               {item.title}
             </Typography>
-            <Typography variant="body1" component="p" gutterBottom>
-              {item.feature1}
+            <Typography variant="body1" component="p" gutterBottom style={{textAlign: "left", fontSize: " small"}}>
+              1: {item.feature1}
             </Typography>
             {item.feature2 && (
-              <Typography variant="body1" component="p" gutterBottom>
-                {item.feature2}
+              <Typography variant="body1" component="p" gutterBottom style={{textAlign: "left", fontSize: " small"}}>
+                2: {item.feature2}
               </Typography>
             )}
             {item.feature3 && (
-              <Typography variant="body1" component="p">
-                {item.feature3}
+              <Typography variant="body1" component="p" style={{textAlign: "left", fontSize: " small"}}>
+                3: {item.feature3}
               </Typography>
             )}
             {/* <Button

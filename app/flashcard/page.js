@@ -165,6 +165,7 @@ const Flashcard = () => (
   <Suspense fallback={<CircularProgress />}>
     <Container maxWidth="100vw">
       <Navbar />
+      
       <FlashcardContent />
     </Container>
   </Suspense>

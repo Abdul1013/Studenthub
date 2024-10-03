@@ -148,7 +148,7 @@ export default function Generate() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4">Generate Flashcard</Typography>
+        <Typography variant="h4">Generate Studycards</Typography>
         <Paper sx={{ p: 4, width: "100%" }}>
           <TextField
             value={text}

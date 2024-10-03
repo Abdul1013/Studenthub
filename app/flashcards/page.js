@@ -69,6 +69,7 @@ export default function Flashcards() {
           mt: 10,
         }}
       >
+        <Typography variant="h4">Generated Studycards</Typography>
         {flashcards.map((flashcard) => (
           <Grid item key={flashcard.id} xs={12} sm={6} md={4}>
             <Card>

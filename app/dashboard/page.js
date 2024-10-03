@@ -59,7 +59,7 @@ const features = [
     path: "/coming-soon",
   },
   {
-    id: 8,
+    id: 7,
     title: "Quiz",
     icon: <QuizIcon />,
     description: "Take quizzes to test your knowledge.",

@@ -25,16 +25,16 @@ const features = [
   },
   {
     id: 2,
-    title: "Generate Flashcard",
+    title: "Generate StudyCards",
     icon: <CreateIcon />,
-    description: "Create new flashcards for study.",
+    description: "Create new studycards for study.",
     path: "./generate",
   },
   {
     id: 3,
-    title: "View Flashcards",
+    title: "View Studycards",
     icon: <ViewListIcon />,
-    description: "Browse and review your existing flashcards.",
+    description: "Browse and review your existing studycards.",
     path: "./flashcards",
   },
   {

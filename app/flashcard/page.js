@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, Suspense } from "react";
-import { collection, doc, getDoc } from "firebase/firestore";
+import {  doc, getDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "@/firebase";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -53,10 +53,10 @@ const FlashcardContent = () => {
           const flashcardsArray = data.flashcards || [];
           setFlashcards(flashcardsArray);
         } else {
-          setError("Flashcards not found.");
+          setError("Studycards not found.");
         }
       } catch (error) {
-        setError("Error fetching flashcards.");
+        setError("Error fetching Studycards.");
       } finally {
         setLoading(false);
       }

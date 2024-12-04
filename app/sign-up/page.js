@@ -12,9 +12,6 @@ import {
 } from "@mui/material";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-  OAuthProvider,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
@@ -22,6 +19,7 @@ import { auth } from "@/firebase";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -31,6 +29,11 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
+
+    if (password !== confirmPassword){
+      setError("Passwords do not match. Please try again");
+      return;
+    }
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -116,7 +119,7 @@ export default function SignUpPage() {
               variant="outlined"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               sx={{ mb: 2 }}
               required
@@ -139,13 +142,7 @@ export default function SignUpPage() {
               Sign Up with Email
             </Button>
           </Box>
-
-          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-            Or sign up with
-          </Typography>
-
-         
-
+          
           <Typography variant="body2" sx={{ mt: 4 }}>
             Already have an account?{" "}
             <Link href="/sign-in" passHref>

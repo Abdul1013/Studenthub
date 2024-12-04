@@ -44,38 +44,7 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    e.preventDefault();
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      setSuccessMessage(
-        "Sign-up with Google successful! Redirecting to sign-in page..."
-      );
-      setTimeout(() => {
-        router.push("/sign-in");
-      }, 3000);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    e.preventDefault();
-    const provider = new OAuthProvider("apple.com");
-    try {
-      await signInWithPopup(auth, provider);
-      setSuccessMessage(
-        "Sign-up with Apple successful! Redirecting to sign-in page..."
-      );
-      setTimeout(() => {
-        router.push("/sign-in");
-      }, 3000);
-    } catch (error) {
-      setError(error.message);
-    }
-  };
-
+ 
   return (
     <Container
       maxWidth="sm"
@@ -175,39 +144,7 @@ export default function SignUpPage() {
             Or sign up with
           </Typography>
 
-          <Button
-            variant="contained"
-            onClick={handleGoogleSignIn}
-            sx={{
-              backgroundColor: "#4285F4",
-              color: "#FFF",
-              mb: 2,
-              "&:hover": {
-                backgroundColor: "#357ae8",
-              },
-              cursor: "pointer",
-            }}
-            fullWidth
-          >
-            Continue with Google
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={handleAppleSignIn}
-            sx={{
-              backgroundColor: "#000",
-              color: "#FFF",
-              mb: 2,
-              "&:hover": {
-                backgroundColor: "#333",
-              },
-              cursor: "pointer",
-            }}
-            fullWidth
-          >
-            Continue with Apple
-          </Button>
+         
 
           <Typography variant="body2" sx={{ mt: 4 }}>
             Already have an account?{" "}

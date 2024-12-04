@@ -189,21 +189,7 @@ export default function SignUpPage() {
             >
               Sign In
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleGoogleSignIn}
-              sx={{
-                backgroundColor: "#DB4437",
-                color: "#FFF",
-                "&:hover": {
-                  backgroundColor: "#c1351d",
-                },
-                cursor: "pointer",
-              }}
-              fullWidth
-            >
-              Sign In with Google
-            </Button>
+          
             <Typography variant="body2" sx={{ mt: 4 }}>
               Don&apos;t have an account?{" "}
               <Link

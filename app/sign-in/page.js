@@ -5,8 +5,6 @@ import {
   getAuth,
   getRedirectResult,
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithRedirect,
 } from "firebase/auth";
 import app from "@/firebase";
 import Navbar from "@/app/Navbar";
@@ -28,7 +26,7 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const auth = getAuth(app);
-  const googleProvider = new GoogleAuthProvider();
+
 
   useEffect(() => {
     const handleRedirectResult = async () => {
@@ -60,7 +58,7 @@ export default function SignUpPage() {
       }
     });
   
-    return () => checkAuthState(); // Cleanup subscription on unmount.
+    return () => checkAuthState(); 
   }, [auth, router]);
   
 
@@ -80,14 +78,6 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithRedirect(auth, googleProvider);
-    } catch (error) {
-      console.error("Google sign-in error:", error);
-      setError(getErrorMessage(error.code));
-    }
-  };
 
   const getErrorMessage = (error) => {
     switch (error) {
@@ -99,8 +89,6 @@ export default function SignUpPage() {
         return "No account found with this email. Please sign up.";
       case "auth/wrong-password":
         return "Incorrect password. Please try again.";
-      case "auth/popup-closed-by-user":
-        return "Google sign-in was canceled. Please try again.";
       default:
         return "An unexpected error occurred. Please try again later.";
     }

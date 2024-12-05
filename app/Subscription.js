@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import {
   Grid,
   Typography,
-  Button,
   Paper,
-  CircularProgress,
 } from "@mui/material";
-import getStripe from "@/utils/get-stripe";
+
 
 export const Subscription = () => {
   const [loading, setLoading] = useState(false);
@@ -42,38 +40,38 @@ export const Subscription = () => {
     },
   ];
 
-  const handleSubmit = async (priceId) => {
-    setLoading(true);
+  // const handleSubmit = async (priceId) => {
+  //   setLoading(true);
 
-    try {
-      const res = await fetch(`/api/checkout_session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ priceId }),
-      });
+  //   try {
+  //     const res = await fetch(`/api/checkout_session`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ priceId }),
+  //     });
 
-      const checkoutSessionJson = await res.json();
+  //     const checkoutSessionJson = await res.json();
 
-      if (res.ok) {
-        const stripe = await getStripe();
-        const { error } = await stripe.redirectToCheckout({
-          sessionId: checkoutSessionJson.id,
-        });
+  //     if (res.ok) {
+  //       const stripe = await getStripe();
+  //       const { error } = await stripe.redirectToCheckout({
+  //         sessionId: checkoutSessionJson.id,
+  //       });
 
-        if (error) {
-          console.warn(error.message);
-        }
-      } else {
-        console.error(checkoutSessionJson.error || "An error occurred");
-      }
-    } catch (error) {
-      console.error("An error occurred during checkout", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       if (error) {
+  //         console.warn(error.message);
+  //       }
+  //     } else {
+  //       console.error(checkoutSessionJson.error || "An error occurred");
+  //     }
+  //   } catch (error) {
+  //     console.error("An error occurred during checkout", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Grid container spacing={2}>

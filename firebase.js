@@ -14,11 +14,10 @@ const firebaseConfig = {
   measurementId: "G-PETXQP0V3R",
 };
 
-
 const app = initializeApp(firebaseConfig);
 
 let analytics;
-if (typeof window !== "undefined") { 
+if (typeof window !== "undefined") {
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);
@@ -28,7 +27,7 @@ if (typeof window !== "undefined") {
   });
 }
 
-export { analytics }; 
+export { analytics };
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 

@@ -1,5 +1,13 @@
 "use client";
-import { Box, Container, Grid, Typography, Link, TextField, Button } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Link,
+  TextField,
+  Button,
+} from "@mui/material";
 
 export default function Footer() {
   return (
@@ -10,71 +18,66 @@ export default function Footer() {
         color: "#FFFFFF",
         py: 3,
         mt: "10px",
-        borderRadius: "6px"
+        borderRadius: "6px",
       }}
       marginTop={6}
-
     >
-      <Container maxWidth="lg"  >
-      <Box
-        textAlign="center"
-        bgcolor="#C1A57B"
-        padding={4}
-        borderRadius={2}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            fontWeight: "bold",
-            fontSize: { xs: "1.5rem", sm: "2rem" },
-          }}
-        >
-          Subscribe to Our Newsletter
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{
-            mb: 4,
-            fontSize: { xs: "1rem", sm: "1.25rem" },
-          }}
-        >
-          Stay updated with the latest features and tips to enhance your study
-          experience.
-        </Typography>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            // Handle the newsletter signup logic here
-          }}
-        >
-          <TextField
-            required
-            label="Email Address"
-            variant="outlined"
-            type="email"
-            sx={{ mr: 2, width: { xs: "100%", sm: "300px" } }}
-          />
-          <Button
-            variant="contained"
-            type="submit"
+      <Container maxWidth="lg">
+        <Box textAlign="center" bgcolor="#C1A57B" padding={4} borderRadius={2}>
+          <Typography
+            variant="h4"
             sx={{
-              backgroundColor: "#30475E",
-              "&:hover": { backgroundColor: "#2C3E50" },
-              mt:"2px",
+              mb: 2,
+              fontWeight: "bold",
+              fontSize: { xs: "1.5rem", sm: "2rem" },
             }}
           >
-            Subscribe
-          </Button>
-        </form>
-      </Box>
+            Subscribe to Our Newsletter
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              mb: 4,
+              fontSize: { xs: "1rem", sm: "1.25rem" },
+            }}
+          >
+            Stay updated with the latest features and tips to enhance your study
+            experience.
+          </Typography>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              // Handle the newsletter signup logic here
+            }}
+          >
+            <TextField
+              required
+              label="Email Address"
+              variant="outlined"
+              type="email"
+              sx={{ mr: 2, width: { xs: "100%", sm: "300px" } }}
+            />
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{
+                backgroundColor: "#30475E",
+                "&:hover": { backgroundColor: "#2C3E50" },
+                mt: "2px",
+              }}
+            >
+              Subscribe
+            </Button>
+          </form>
+        </Box>
         <Grid container spacing={4}>
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" gutterBottom>
               About Us
             </Typography>
             <Typography variant="body2">
-              Studenthub is your go-to platform for managing and learning with flashcards. Keep track of your progress and achieve your goals.
+              studyhub is your go-to platform for managing and learning with
+              flashcards. Keep track of your progress and achieve your goals.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -96,7 +99,8 @@ export default function Footer() {
               Stay Connected
             </Typography>
             <Typography variant="body2">
-              Follow us on social media to stay updated with the latest features.
+              Follow us on social media to stay updated with the latest
+              features.
             </Typography>
             <Box sx={{ mt: 2 }}>
               <Link href="#" color="inherit" underline="none" sx={{ pr: 1 }}>
@@ -113,7 +117,8 @@ export default function Footer() {
         </Grid>
         <Box sx={{ textAlign: "center", mt: 3 }}>
           <Typography variant="body2" color="inherit">
-            &copy; {new Date().getFullYear()} Studenthub. All rights reserved. @abdulthedev
+            &copy; {new Date().getFullYear()} studyhub. All rights reserved.
+            @abdulthedev
           </Typography>
         </Box>
       </Container>

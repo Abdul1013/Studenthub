@@ -54,17 +54,26 @@ export default function Navbar() {
         </Button>
       </ListItem>
       <ListItem>
-        <Button onClick={() => router.push("/flashcards")} aria-label="Flashcards">
+        <Button
+          onClick={() => router.push("/flashcards")}
+          aria-label="Flashcards"
+        >
           Studycards
         </Button>
       </ListItem>
       {!user ? (
         <ListItem>
-          <Box sx={{ display: "flex", gap: 2}}>
-            <Button onClick={() => router.push("/sign-in")} aria-label="Sign-In">
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              onClick={() => router.push("/sign-in")}
+              aria-label="Sign-In"
+            >
               Login
             </Button>
-            <Button onClick={() => router.push("/sign-up")} aria-label="Sign-Up">
+            <Button
+              onClick={() => router.push("/sign-up")}
+              aria-label="Sign-Up"
+            >
               SignUp
             </Button>
           </Box>
@@ -72,7 +81,10 @@ export default function Navbar() {
       ) : (
         <>
           <ListItem>
-            <Typography variant="body1" sx={{ marginRight: 2, color: "#FFFFFF" }}>
+            <Typography
+              variant="body1"
+              sx={{ marginRight: 2, color: "#FFFFFF" }}
+            >
               {user.displayName || "User"}
             </Typography>
           </ListItem>
@@ -88,7 +100,7 @@ export default function Navbar() {
     <AppBar position="fixed" sx={{ bgcolor: "#222831" }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          Studenthub
+          studyhub
         </Typography>
 
         {isMobile ? (

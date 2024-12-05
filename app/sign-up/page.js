@@ -10,14 +10,13 @@ import {
   Button,
   Paper,
 } from "@mui/material";
-import {
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,13 +29,22 @@ export default function SignUpPage() {
     setError("");
     setSuccessMessage("");
 
-    if (password !== confirmPassword){
+    if (password !== confirmPassword) {
       setError("Passwords do not match. Please try again");
       return;
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: username,
+      });
 
       setSuccessMessage("Sign-up successful! Redirecting to sign-in page...");
       setTimeout(() => {
@@ -47,7 +55,6 @@ export default function SignUpPage() {
     }
   };
 
- 
   return (
     <Container
       maxWidth="sm"
@@ -56,18 +63,40 @@ export default function SignUpPage() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        maxHeight: "100vh",
-        marginTop: "100px",
+        minHeight: "100vh",
+        px: 2,
+        marginTop: "50px",
       }}
     >
       <Navbar />
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{
+          mb: 2,
+          textAlign: "center",
+          fontSize: {
+            xs: "1.8rem",
+            sm: "2rem",
+          },
+          color: "primary.main",
+        }}
+      >
+        Welcome to StudyHub
+      </Typography>
       <Paper
         elevation={2}
         sx={{
           width: "100%",
-          padding: "2rem",
+          maxWidth: 400,
+          padding: {
+            xs: "1.5rem",
+            sm: "2rem",
+          },
           border: "2px solid #30475E",
           borderRadius: "8px",
+          textAlign: "center",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Box
@@ -80,16 +109,44 @@ export default function SignUpPage() {
           alignItems="center"
           justifyContent="center"
         >
-          <Typography variant="h4" gutterBottom sx={{ mb: 5 }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              mb: 2,
+              fontSize: {
+                xs: "1.5rem",
+                sm: "1.8rem",
+              },
+            }}
+          >
             Sign Up
           </Typography>
           {error && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{
+                mb: 2,
+                fontSize: {
+                  xs: "0.9rem",
+                },
+              }}
+            >
               {error}
             </Typography>
           )}
           {successMessage && (
-            <Typography variant="body1" color="success.main" sx={{ mb: 2 }}>
+            <Typography
+              variant="body1"
+              color="success.main"
+              sx={{
+                mb: 2,
+                fontSize: {
+                  xs: "1rem",
+                },
+              }}
+            >
               {successMessage}
             </Typography>
           )}
@@ -105,6 +162,16 @@ export default function SignUpPage() {
               required
             />
             <TextField
+              label="Username"
+              type="text"
+              variant="outlined"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              fullWidth
+              sx={{ mb: 2 }}
+              required
+            />
+            <TextField
               label="Password"
               variant="outlined"
               type="password"
@@ -112,19 +179,18 @@ export default function SignUpPage() {
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               sx={{ mb: 2 }}
-              required/>
-
+              required
+            />
             <TextField
               label="Confirm Password"
               variant="outlined"
               type="password"
-              value={password}
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               sx={{ mb: 2 }}
               required
             />
-
             <Button
               type="submit"
               variant="contained"
@@ -136,14 +202,25 @@ export default function SignUpPage() {
                   backgroundColor: "#2c3e50",
                 },
                 cursor: "pointer",
+                fontSize: {
+                  xs: "0.9rem",
+                  sm: "1rem",
+                },
               }}
-              fullWidth
             >
               Sign Up with Email
             </Button>
           </Box>
-          
-          <Typography variant="body2" sx={{ mt: 4 }}>
+
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 4,
+              fontSize: {
+                xs: "0.85rem",
+              },
+            }}
+          >
             Already have an account?{" "}
             <Link href="/sign-in" passHref>
               <Typography

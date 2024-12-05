@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../Navbar";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Container, Grid, Paper, Typography, Box } from "@mui/material";
 import {
@@ -74,22 +73,22 @@ const Dashboard = () => {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        setUsername(currentUser.displayName || currentUser.email);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        setUsername(user.displayName || "User"); // Use displayName or fallback
       } else {
-        router.push("/sign-in");
+        router.push("/sign-in"); // Redirect if not logged in
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup listener
   }, [router]);
 
-  const handleFeatureClick = (path, e) => {
-    e.preventDefault();
+  const handleFeatureClick = (path) => {
     router.push(path);
   };
+
   return (
     <Container>
       <Navbar />
@@ -109,7 +108,7 @@ const Dashboard = () => {
           gutterBottom
           style={{ marginTop: "20px" }}
         >
-          Welcome, {username}
+          Welcome, {username}!
         </Typography>
 
         <Grid container spacing={2}>
@@ -123,8 +122,9 @@ const Dashboard = () => {
                   borderRadius: "10px",
                   cursor: "pointer",
                   backgroundColor: "#30475E",
+                  color: "white",
                 }}
-                onClick={(e) => handleFeatureClick(feature.path, e)}
+                onClick={() => handleFeatureClick(feature.path)}
               >
                 <div style={{ fontSize: "40px", marginBottom: "10px" }}>
                   {feature.icon}

@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 
-export default function SignUpPage() {
+export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +26,6 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const auth = getAuth(app);
-
 
   useEffect(() => {
     const handleRedirectResult = async () => {
@@ -36,36 +35,26 @@ export default function SignUpPage() {
           console.log("Google Sign-In successful: ", result.user);
           setSuccessMessage("Sign-in successful! Redirecting to Dashboard...");
           router.push("/dashboard");
-        } else {
-          console.log("No redirect result. Staying on the sign-in page.");
         }
       } catch (error) {
         console.error("Redirect result error:", error);
         setError(getErrorMessage(error.code));
       }
     };
-  
+
     handleRedirectResult();
   }, [auth, router]);
-  
+
   useEffect(() => {
-    const checkAuthState = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         console.log("User is logged in:", user);
         router.push("/dashboard");
-      } else {
-        console.log("No user logged in. Staying on sign-in page.");
       }
     });
-  
-    return () => checkAuthState(); 
-  }, [auth, router]);
-  
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
-    setError("");
-  };
+    return unsubscribe; // Correctly clean up the listener
+  }, [auth, router]);
 
   const handleSignInWithPassword = async () => {
     try {
@@ -78,9 +67,8 @@ export default function SignUpPage() {
     }
   };
 
-
-  const getErrorMessage = (error) => {
-    switch (error) {
+  const getErrorMessage = (code) => {
+    switch (code) {
       case "auth/invalid-email":
         return "Invalid email address. Please check your email and try again.";
       case "auth/user-disabled":
@@ -93,7 +81,6 @@ export default function SignUpPage() {
         return "An unexpected error occurred. Please try again later.";
     }
   };
-  
 
   return (
     <Container
@@ -136,11 +123,16 @@ export default function SignUpPage() {
             </Typography>
           )}
           {successMessage && (
-            <Typography variant="body1" color="success.main" gutterBottom sx={{ mb: 2 }}>
+            <Typography
+              variant="body1"
+              color="success.main"
+              gutterBottom
+              sx={{ mb: 2 }}
+            >
               {successMessage}
             </Typography>
           )}
-          <Box component="form" onSubmit={handleSignIn}>
+          <Box component="form" onSubmit={(e) => e.preventDefault()}>
             <TextField
               label="Email"
               type="email"
@@ -177,7 +169,6 @@ export default function SignUpPage() {
             >
               Sign In
             </Button>
-          
             <Typography variant="body2" sx={{ mt: 4 }}>
               Don&apos;t have an account?{" "}
               <Link

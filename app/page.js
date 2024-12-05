@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <Container>
       <Head>
-        <title>StudentHub</title>
+        <title>studyhub</title>
         <meta name="description" content="Create flashcards from your text" />
       </Head>
       <Navbar />
@@ -65,7 +65,7 @@ export default function Home() {
             fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
           }}
         >
-          Welcome To StudentHub
+          Welcome To studyhub
         </Typography>
 
         <Typography

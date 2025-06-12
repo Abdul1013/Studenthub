@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# 🎓 StudentHub
 
-First, run the development server:
+A modern **Next.js** web application that allows students to study efficiently for their exams, test with **flashcards** and **quizzes** using **AI**, with **Groq API** for natural language processing and  styled with **Material UI** for a clean, responsive design.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+
+## ✨ Features
+
+* 🤖 **AI-powered Content Generation** using **Groq API**
+* 🧠 Create flashcards and quizzes from topics or pasted content
+* 🎨 Beautiful, responsive UI using **Material UI (MUI)**
+* 📝 User authentication & dashboard 
+* 📱 Fully responsive across devices
+
+---
+
+## 🚀 Tech Stack
+
+* **Next.js 15** – Framework for server-side rendering & routing
+* **Javascript** – Static typing for safer development
+* **Groq API** – AI-generated content (flashcards, quizzes)
+* **Paystack** – Payment gateway integration
+* **Material UI** – Component-based UI with theme customization
+* **Tailwind CSS ** –  used alongside MUI for layout utility
+
+---
+
+
+## 🛠 Project Structure
+
+```
+/
+├── components/       # Reusable UI components (e.g., QuizCard, Flashcard)
+├── App/      
+├── lib/              # Groq API, Paystack utilities
+├── styles/           # Global styles and MUI themes
+├── public/           # Static assets
+├── utils/            # Helper functions
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 💳 Payments via Paystack
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The app uses **Paystack** to unlock premium features (e.g., unlimited generations, export, save to account).
+Integration includes:
 
-## Learn More
+* Inline checkout via Paystack’s React SDK
+* Webhook support (optional for server-side validation)
+* User plan or credit-based system (if applicable)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧠 Powered by Groq API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+AI capabilities include:
 
-## Deploy on Vercel
+* Summarizing text to generate flashcards
+* Converting content into multiple-choice or open-ended questions
+* Topic-based quiz generation
+* Adjustable difficulty levels
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## 📌 To-Do / Roadmap
+
+* [ ] User performance analytics and monitoring
+* [ ] Export to PDF / print format
+* [ ] Quiz scoring system with analytics
+* [ ] AI difficulty tuning
+
+---
+
+
+## 📄 License
+
+MIT License © 2025 Your Name
+
+---
+
+## 🔗 Useful Links
+
+* [Groq API Docs](https://console.groq.com/docs)
+* [Paystack Docs](https://paystack.com/docs)
+* [Material UI](https://mui.com/)
+* [Next.js](https://nextjs.org/)
+
